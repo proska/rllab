@@ -6,7 +6,7 @@ from sandbox.rocky.tf.distributions import Categorical
 from sandbox.rocky.tf.policies import StochasticPolicy
 from rllab.misc import ext
 from sandbox.rocky.tf.misc import tensor_utils
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 from rllab.misc.overrides import overrides
 from sandbox.rocky.tf.spaces import Discrete
 import tensorflow as tf
@@ -70,7 +70,7 @@ class CategoricalConvPolicy(StochasticPolicy, LayersPowered, Serializable):
 
     @overrides
     def dist_info_sym(self, obs_var, state_info_vars=None, name="dist_info_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             return dict(prob=L.get_output(self._l_prob, {self._l_obs: tf.cast(obs_var, tf.float32)}))
 
     @overrides

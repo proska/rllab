@@ -67,7 +67,7 @@ class FirstOrderOptimizer(Serializable):
         :param inputs: A list of symbolic variables as inputs
         :return: No return value.
         """
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             self._target = target
 
             self._train_op = self._tf_optimizer.minimize(loss, var_list=target.get_params(trainable=True))

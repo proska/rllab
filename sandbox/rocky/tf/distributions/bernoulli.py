@@ -3,7 +3,7 @@
 from .base import Distribution
 import tensorflow as tf
 import numpy as np
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 
 TINY = 1e-8
 
@@ -18,7 +18,7 @@ class Bernoulli(Distribution):
         return self._dim
 
     def kl_sym(self, old_dist_info_vars, new_dist_info_vars, name="kl_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             old_p = old_dist_info_vars["p"]
             new_p = new_dist_info_vars["p"]
             kl = old_p * (tf.log(old_p + TINY) - tf.log(new_p + TINY)) + \
@@ -38,7 +38,7 @@ class Bernoulli(Distribution):
         return np.cast['int'](np.random.uniform(low=0., high=1., size=p.shape) < p)
 
     def likelihood_ratio_sym(self, x_var, old_dist_info_vars, new_dist_info_vars, name="likelihood_ratio_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             old_p = old_dist_info_vars["p"]
             new_p = new_dist_info_vars["p"]
             ndims = old_p.get_shape().ndims
@@ -46,7 +46,7 @@ class Bernoulli(Distribution):
                                   axis=ndims - 1)
 
     def log_likelihood_sym(self, x_var, dist_info_vars, name="log_likelihood_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             p = dist_info_vars["p"]
             ndims = p.get_shape().ndims
             return tf.reduce_sum(x_var * tf.log(p + TINY) + (1 - x_var) * tf.log(1 - p + TINY), axis=ndims - 1)

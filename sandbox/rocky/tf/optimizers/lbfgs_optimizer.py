@@ -2,7 +2,7 @@
 
 from rllab.misc import ext
 from sandbox.rocky.tf.misc import tensor_utils
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 from rllab.core import Serializable
 import tensorflow as tf
 import scipy.optimize
@@ -14,7 +14,7 @@ class LbfgsOptimizer(Serializable):
     Performs unconstrained optimization via L-BFGS.
     """
 
-    def __init__(self, name, max_opt_itr=20, callback=None, name="LbfgsOptimizer"):
+    def __init__(self, max_opt_itr=20, callback=None, name="LbfgsOptimizer"):
         Serializable.quick_init(self, locals())
         self._name = name
         self._max_opt_itr = max_opt_itr
@@ -32,7 +32,7 @@ class LbfgsOptimizer(Serializable):
         :param inputs: A list of symbolic variables as inputs
         :return: No return value.
         """
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             self._target = target
 
             def get_opt_output():

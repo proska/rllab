@@ -7,7 +7,7 @@ import itertools
 import numpy as np
 import tensorflow as tf
 from sandbox.rocky.tf.misc import tensor_utils
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 from rllab.misc import sliced_fun
 
 
@@ -20,7 +20,7 @@ class PerlmutterHvp(object):
         self._name = name
 
     def update_opt(self, f, target, inputs, reg_coeff, name="update_opt"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             self.target = target
             self.reg_coeff = reg_coeff
             params = target.get_params(trainable=True)
@@ -71,7 +71,7 @@ class FiniteDifferenceHvp(object):
         self._name = name
 
     def update_opt(self, f, target, inputs, reg_coeff, name="update_opt"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             self.target = target
             self.reg_coeff = reg_coeff
 
@@ -183,7 +183,7 @@ class ConjugateGradientOptimizer(Serializable):
         :param extra_inputs: A list of symbolic variables as extra inputs which should not be subsampled
         :return: No return value.
         """
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             inputs = tuple(inputs)
             if extra_inputs is None:
                 extra_inputs = tuple()

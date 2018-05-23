@@ -8,7 +8,7 @@ from sandbox.rocky.tf.core.layers import batch_norm
 from sandbox.rocky.tf.distributions import Categorical
 from sandbox.rocky.tf.policies import StochasticPolicy
 from sandbox.rocky.tf.misc import tensor_utils
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 
 import tensorflow as tf
 import sandbox.rocky.tf.core.layers as L
@@ -78,7 +78,7 @@ class ContinuousMLPQFunction(QFunction, LayersPowered, Serializable):
         return self._f_qval(observations, actions)
 
     def get_qval_sym(self, obs_var, action_var, **kwargs, name="get_qval_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             qvals = L.get_output(
                 self._output_layer,
                 {self._obs_layer: obs_var, self._action_layer: action_var},

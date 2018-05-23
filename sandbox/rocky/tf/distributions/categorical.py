@@ -1,7 +1,7 @@
 import numpy as np
 from .base import Distribution
 import tensorflow as tf
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 
 TINY = 1e-8
 
@@ -35,7 +35,7 @@ class Categorical(Distribution):
         """
         Compute the symbolic KL divergence of two categorical distributions
         """
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             old_prob_var = old_dist_info_vars["prob"]
             new_prob_var = new_dist_info_vars["prob"]
             ndims = old_prob_var.get_shape().ndims
@@ -57,7 +57,7 @@ class Categorical(Distribution):
         )
 
     def likelihood_ratio_sym(self, x_var, old_dist_info_vars, new_dist_info_vars, name="likelihood_ratio_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             old_prob_var = old_dist_info_vars["prob"]
             new_prob_var = new_dist_info_vars["prob"]
             ndims = old_prob_var.get_shape().ndims
@@ -67,12 +67,12 @@ class Categorical(Distribution):
                    (tf.reduce_sum(old_prob_var * x_var, ndims - 1) + TINY)
 
     def entropy_sym(self, dist_info_vars, name="entropy_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             probs = dist_info_vars["prob"]
             return -tf.reduce_sum(probs * tf.log(probs + TINY), axis=1)
 
     def cross_entropy_sym(self, old_dist_info_vars, new_dist_info_vars, name="cross_entropy_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             old_prob_var = old_dist_info_vars["prob"]
             new_prob_var = new_dist_info_vars["prob"]
             ndims = old_prob_var.get_shape().ndims
@@ -87,7 +87,7 @@ class Categorical(Distribution):
         return -np.sum(probs * np.log(probs + TINY), axis=1)
 
     def log_likelihood_sym(self, x_var, dist_info_vars, name="log_likelihood_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             probs = dist_info_vars["prob"]
             ndims = probs.get_shape().ndims
             return tf.log(tf.reduce_sum(probs * tf.cast(x_var, tf.float32), ndims - 1) + TINY)
@@ -105,7 +105,7 @@ class Categorical(Distribution):
         return self._f_sample(dist_info["prob"])
 
     def sample_sym(self, dist_info, name="sample_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             probs = dist_info["prob"]
             samples = tf.multinomial(tf.log(probs + 1e-8), num_samples=1)[:, 0]
             return tf.nn.embedding_lookup(np.eye(self.dim, dtype=np.float32), samples)

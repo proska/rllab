@@ -4,7 +4,7 @@
 import tensorflow as tf
 import numpy as np
 from sandbox.rocky.tf.distributions import Distribution
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 
 
 class DiagonalGaussian(Distribution):
@@ -42,7 +42,7 @@ class DiagonalGaussian(Distribution):
         #     numerator / denominator + TT.log(new_std) - TT.log(old_std ), axis=-1)
 
     def kl_sym(self, old_dist_info_vars, new_dist_info_vars, name = "kl_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             old_means = old_dist_info_vars["mean"]
             old_log_stds = old_dist_info_vars["log_std"]
             new_means = new_dist_info_vars["mean"]
@@ -65,13 +65,13 @@ class DiagonalGaussian(Distribution):
                 numerator / denominator + new_log_stds - old_log_stds, axis=-1)
 
     def likelihood_ratio_sym(self, x_var, old_dist_info_vars, new_dist_info_vars, name = "likelihood_ratio_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             logli_new = self.log_likelihood_sym(x_var, new_dist_info_vars)
             logli_old = self.log_likelihood_sym(x_var, old_dist_info_vars)
             return tf.exp(logli_new - logli_old)
 
     def log_likelihood_sym(self, x_var, dist_info_vars, name = "log_likelihood_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             means = dist_info_vars["mean"]
             log_stds = dist_info_vars["log_std"]
             zs = (x_var - means) / tf.exp(log_stds)
@@ -98,7 +98,7 @@ class DiagonalGaussian(Distribution):
         return np.sum(log_stds + np.log(np.sqrt(2 * np.pi * np.e)), axis=-1)
 
     def entropy_sym(self, dist_info_var, name = "entropy_sym"):
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             log_std_var = dist_info_var["log_std"]
             return tf.reduce_sum(log_std_var + np.log(np.sqrt(2 * np.pi * np.e)), axis=-1)
 

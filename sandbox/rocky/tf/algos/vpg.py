@@ -6,7 +6,7 @@ from rllab.misc.overrides import overrides
 from sandbox.rocky.tf.algos import BatchPolopt
 from sandbox.rocky.tf.optimizers import FirstOrderOptimizer
 from sandbox.rocky.tf.misc import tensor_utils
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 from rllab.core import Serializable
 import tensorflow as tf
 
@@ -43,7 +43,7 @@ class VPG(BatchPolopt, Serializable):
 
     @overrides
     def init_opt(self):
-        with sys_op_scope(self.name, "init_opt"):
+        with enclosing_scope(self.name, "init_opt"):
             is_recurrent = int(self.policy.recurrent)
 
             obs_var = self.env.observation_space.new_tensor_variable(

@@ -7,7 +7,7 @@ import rllab.misc.logger as logger
 from sandbox.rocky.tf.optimizers import PenaltyLbfgsOptimizer
 from sandbox.rocky.tf.algos import BatchPolopt
 from sandbox.rocky.tf.misc import tensor_utils
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 import tensorflow as tf
 
 
@@ -34,7 +34,7 @@ class NPO(BatchPolopt):
 
     @overrides
     def init_opt(self):
-        with sys_op_scope(self.name, "init_opt"):
+        with enclosing_scope(self.name, "init_opt"):
             is_recurrent = int(self.policy.recurrent)
             obs_var = self.env.observation_space.new_tensor_variable(
                 'obs',

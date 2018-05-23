@@ -180,7 +180,7 @@ class GaussianLSTMPolicy(StochasticPolicy, LayersPowered, Serializable):
 
     @overrides
     def dist_info_sym(self, obs_var, state_info_vars, name="dist_info_sym"):
-        with sys_op_scope(self.name, name):
+        with enclosing_scope(self.name, name):
             n_batches = tf.shape(obs_var)[0]
             n_steps = tf.shape(obs_var)[1]
             obs_var = tf.reshape(obs_var, tf.stack([n_batches, n_steps, -1]))

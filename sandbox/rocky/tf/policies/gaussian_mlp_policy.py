@@ -11,7 +11,7 @@ from sandbox.rocky.tf.distributions import DiagonalGaussian
 from rllab.misc.overrides import overrides
 from rllab.misc import logger
 from sandbox.rocky.tf.misc import tensor_utils
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 import tensorflow as tf
 
 class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
@@ -175,7 +175,7 @@ class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
         return True
 
     def dist_info_sym(self, obs_var, state_info_vars=None, name="dist_info_sym"):
-        with sys_op_scope(self.name, name):
+        with enclosing_scope(self.name, name):
             mean_var, std_param_var = L.get_output([self._l_mean, self._l_std_param], obs_var)
             if self.min_std_param is not None:
                 std_param_var = tf.maximum(std_param_var, self.min_std_param)
@@ -211,7 +211,7 @@ class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
         :param old_dist_info_vars:
         :return:
         """
-        with sys_op_scope(self.name, name):
+        with enclosing_scope(self.name, name):
             new_dist_info_vars = self.dist_info_sym(obs_var, action_var)
             new_mean_var, new_log_std_var = new_dist_info_vars["mean"], new_dist_info_vars["log_std"]
             old_mean_var, old_log_std_var = old_dist_info_vars["mean"], old_dist_info_vars["log_std"]

@@ -1,5 +1,5 @@
 from sandbox.rocky.tf.misc import tensor_utils
-from sandbox.rocky.tf.misc.tensor_utils import sys_op_scope
+from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 from rllab.misc import logger
 from rllab.misc import ext
 from rllab.core import Serializable
@@ -51,7 +51,7 @@ class PenaltyLbfgsOptimizer(Serializable):
         :param inputs: A list of symbolic variables as inputs
         :return: No return value.
         """
-        with sys_op_scope(self._name, name):
+        with enclosing_scope(self._name, name):
             constraint_term, constraint_value = leq_constraint
             penalty_var = tf.placeholder(tf.float32, tuple(), name="penalty")
             penalized_loss = loss + penalty_var * constraint_term
