@@ -32,18 +32,20 @@ class PerlmutterHvp(object):
 
             xs = tuple([tensor_utils.new_tensor_like(p.name.split(":")[0], p) for p in params])
 
-            def Hx_plain():
-                Hx_plain_splits = tf.gradients(
-                    tf.reduce_sum(
-                        tf.stack([tf.reduce_sum(g * x) for g, x in zip(constraint_grads, xs)])
-                    ),
-                    params,
-                    name="Hx_plain_gradients"
-                )
-                for idx, (Hx, param) in enumerate(zip(Hx_plain_splits, params)):
-                    if Hx is None:
-                        Hx_plain_splits[idx] = tf.zeros_like(param)
-                return tensor_utils.flatten_tensor_variables(Hx_plain_splits)
+            def Hx_plain(original_scope_name=tf.get_variable_scope().name):
+                with tf.variable_scope(original_scope_name):
+                    with enclosing_scope(name, "Hx_plain"):
+                        Hx_plain_splits = tf.gradients(
+                            tf.reduce_sum(
+                                tf.stack([tf.reduce_sum(g * x) for g, x in zip(constraint_grads, xs)])
+                            ),
+                            params,
+                            name="Hx_plain_gradients"
+                        )
+                        for idx, (Hx, param) in enumerate(zip(Hx_plain_splits, params)):
+                            if Hx is None:
+                                Hx_plain_splits[idx] = tf.zeros_like(param)
+                        return tensor_utils.flatten_tensor_variables(Hx_plain_splits)
 
             self.opt_fun = ext.lazydict(
                 f_Hx_plain=lambda: tensor_utils.compile_function(
