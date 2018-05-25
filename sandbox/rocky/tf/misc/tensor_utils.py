@@ -123,22 +123,22 @@ def pad_tensor_dict(tensor_dict, max_len):
 
 
 class enclosing_scope(object):
-    def __init__(self, primitive_name, sys_op_name, **kwargs):
-        self.primitive_scope = None
-        self.sys_op_scope = None
-        self.primitive_name = primitive_name
-        self.sys_op_name = sys_op_name
+    def __init__(self, enclosing_name, name, **kwargs):
+        self.enclosing_scope = None
+        self.scope = None
+        self.enclosing_name = enclosing_name
+        self.name = name
         self.kwargs = kwargs
 
     def __enter__(self):
-        if self.primitive_name not in tf.get_variable_scope().name:
-            self.primitive_scope = tf.variable_scope(self.primitive_name,
+        if self.enclosing_name not in tf.get_variable_scope().name:
+            self.enclosing_scope = tf.variable_scope(self.enclosing_name,
                                                      self.kwargs)
-            self.primitive_scope.__enter__()
-        self.sys_op_scope = tf.variable_scope(self.sys_op_name, self.kwargs)
-        self.sys_op_scope.__enter__()
+            self.enclosing_scope.__enter__()
+        self.scope = tf.variable_scope(self.name, self.kwargs)
+        self.scope.__enter__()
 
     def __exit__(self, *args):
-        self.sys_op_scope.__exit__(*args)
-        if self.primitive_scope is not None:
-            self.primitive_scope.__exit__(*args)
+        self.scope.__exit__(*args)
+        if self.enclosing_scope is not None:
+            self.enclosing_scope.__exit__(*args)
