@@ -59,7 +59,7 @@ class RandomizedEnv(Env, Serializable):
         self._wrapped_env.qvel_dim = self._wrapped_env.init_qvel.size
         self._wrapped_env.ctrl_dim = self._wrapped_env.init_ctrl.size
         self._wrapped_env.frame_skip = 1
-        self._wrapped_env.dcom = None 
+        self._wrapped_env.dcom = None
         self._wrapped_env.current_com = None
         return self._wrapped_env.reset()
 
