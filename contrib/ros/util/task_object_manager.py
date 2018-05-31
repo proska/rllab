@@ -89,7 +89,7 @@ class TaskObjectManager(object):
     def targets(self):
         return self._targets
 
-    def sub_gazebo(self):
+    def subscribe_gazebo(self):
         rospy.Subscriber('/gazebo/model_states', ModelStates,
                          self._gazebo_update_manipulatable_states)
 
