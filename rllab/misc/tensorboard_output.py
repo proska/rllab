@@ -1,14 +1,14 @@
+from os.path import abspath, dirname
 import shutil
-from os.path import dirname, abspath
 
 import google.protobuf.json_format as json_format
-import numpy as np
-import tensorflow as tf
 from jsonmerge import merge
-from tensorboard import summary as summary_lib
-from tensorboard.backend.event_processing import plugin_event_multiplexer as event_multiplexer
+import numpy as np
 from tensorboard.plugins.custom_scalar import layout_pb2
 from tensorboard.plugins.custom_scalar import metadata
+from tensorboard import summary as summary_lib
+from tensorboard.backend.event_processing import plugin_event_multiplexer as event_multiplexer
+import tensorflow as tf
 
 import rllab.misc.logger
 from rllab.misc.console import mkdir_p

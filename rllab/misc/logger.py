@@ -1,20 +1,20 @@
 import base64
+from contextlib import contextmanager
 import csv
 import datetime
+from enum import Enum
 import json
 import os
 import os.path as osp
 import pickle
 import sys
-from contextlib import contextmanager
-from enum import Enum
 
 import dateutil.tz
 import joblib
 import numpy as np
 
 from rllab.misc.autoargs import get_all_parameters
-from rllab.misc.console import mkdir_p, colorize
+from rllab.misc.console import colorize, mkdir_p
 from rllab.misc.tabulate import tabulate
 from rllab.misc.tensorboard_output import TensorBoardOutput
 
