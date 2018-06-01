@@ -2,7 +2,8 @@ from gym import Env
 import numpy as np
 
 from rllab.spaces import Discrete
-from rllab.envs import EnvSpec, Step
+from rllab.envs import Step
+from rllab.envs.env_spec import EnvSpec
 from rllab.core import Serializable
 
 MAPS = {

@@ -1,7 +1,7 @@
 from gym import Env
 
 from rllab.core import Serializable
-from rllab.envs import EnvSpec
+from rllab.envs.env_spec import EnvSpec
 
 
 class ProxyEnv(Env, Serializable):

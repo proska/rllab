@@ -16,7 +16,7 @@ import numpy as np
 import theano
 
 from rllab import spaces
-from rllab.envs import EnvSpec
+from rllab.envs.env_spec import EnvSpec
 from rllab.misc.overrides import overrides
 from rllab.misc import autoargs
 from rllab.misc import logger

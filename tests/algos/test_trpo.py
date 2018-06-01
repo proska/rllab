@@ -5,7 +5,8 @@ import theano.tensor as TT
 
 from rllab.algos import TRPO
 from rllab.baselines import ZeroBaseline
-from rllab.envs import EnvSpec, Step
+from rllab.envs import Step
+from rllab.envs.env_spec import EnvSpec
 from rllab.policies import GaussianMLPPolicy
 from rllab.spaces import Box
 

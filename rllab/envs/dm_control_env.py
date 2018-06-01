@@ -6,7 +6,8 @@ from dm_control import suite
 from dm_control.rl.environment import StepType
 from dm_control.rl.control import flatten_observation
 
-from rllab.envs import EnvSpec, Step
+from rllab.envs import Step
+from rllab.envs.env_spec import EnvSpec
 from rllab.envs.dm_control_viewer import DmControlViewer
 from rllab.core import Serializable
 from rllab.spaces import Box
