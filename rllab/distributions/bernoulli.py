@@ -1,8 +1,7 @@
-
-
-from .base import Distribution
-import theano.tensor as TT
 import numpy as np
+import theano.tensor as TT
+
+from sandbox.rocky.tf.distributions.base import Distribution
 
 TINY = 1e-8
 

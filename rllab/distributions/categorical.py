@@ -1,6 +1,7 @@
-import theano.tensor as TT
 import numpy as np
-from .base import Distribution
+import theano.tensor as TT
+
+from sandbox.rocky.tf.distributions.base import Distribution
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 
 TINY = 1e-8

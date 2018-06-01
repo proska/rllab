@@ -1,6 +1,8 @@
 import numpy as np
-from .base import Distribution
 import tensorflow as tf
+
+from sandbox.rocky.tf.distributions.base import Distribution
+from sandbox.rocky.tf.misc import tensor_utils
 from sandbox.rocky.tf.misc.tensor_utils import enclosing_scope
 
 TINY = 1e-8
