@@ -38,8 +38,8 @@ class Bernoulli(Distribution):
         old_p = old_dist_info_vars["p"]
         new_p = new_dist_info_vars["p"]
         return TT.prod(
-            x_var * new_p / (old_p + TINY) + (1 - x_var) * (1 - new_p) /
-            (1 - old_p + TINY),
+            x_var * new_p / (old_p + TINY) + 
+            (1 - x_var) * (1 - new_p) / (1 - old_p + TINY),
             axis=-1)
 
     def log_likelihood_sym(self, x_var, dist_info_vars):
