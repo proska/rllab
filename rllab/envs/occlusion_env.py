@@ -1,12 +1,12 @@
-import numpy as np
 from cached_property import cached_property
+import numpy as np
 
 from rllab import spaces
 from rllab.core import Serializable
-from rllab.envs.proxy_env import ProxyEnv
-from rllab.misc.overrides import overrides
 from rllab.envs import Step
 from rllab.envs.mujoco import MujocoEnv
+from rllab.envs.proxy_env import ProxyEnv
+from rllab.misc.overrides import overrides
 
 BIG = 1e6
 
@@ -21,9 +21,11 @@ class OcclusionEnv(ProxyEnv, Serializable):
         '''
         Serializable.quick_init(self, locals())
 
+        self.action_dim = self.action_space.flat_dim
         self._set_sensor_mask(env, sensor_idx)
         super(OcclusionEnv, self).__init__(env)
         self._dt = 1
+        self.spec = super().spec()
         if isinstance(env, MujocoEnv):
             self._dt = env.sim.opt.timestep * env.frame_skip
 

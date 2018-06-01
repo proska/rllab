@@ -1,4 +1,3 @@
-from rllab.envs.base import Env
 from rllab.envs.base import EnvSpec
 from rllab.envs.base import Step
 from rllab.envs.grid_world_env import GridWorldEnv

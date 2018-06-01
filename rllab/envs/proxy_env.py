@@ -1,5 +1,7 @@
+from gym import Env
+
 from rllab.core import Serializable
-from .base import Env
+from rllab.envs import EnvSpec
 
 
 class ProxyEnv(Env, Serializable):
@@ -43,3 +45,15 @@ class ProxyEnv(Env, Serializable):
 
     def set_param_values(self, params):
         self._wrapped_env.set_param_values(params)
+
+    def action_dim(self):
+        return self.action_space.flat_dim
+
+    def spec(self):
+        return EnvSpec(
+            observation_space=self.observation_space,
+            action_space=self.action_space,
+        )
+
+    def log_diagnostics(self, paths):
+        pass

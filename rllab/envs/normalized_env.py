@@ -2,10 +2,10 @@ import numpy as np
 
 from rllab import spaces
 from rllab.core import Serializable
-from rllab.envs.proxy_env import ProxyEnv
-from rllab.spaces import Box
-from rllab.misc.overrides import overrides
 from rllab.envs import Step
+from rllab.envs.proxy_env import ProxyEnv
+from rllab.misc.overrides import overrides
+from rllab.spaces import Box
 
 
 class NormalizedEnv(ProxyEnv, Serializable):
@@ -20,6 +20,8 @@ class NormalizedEnv(ProxyEnv, Serializable):
     ):
         Serializable.quick_init(self, locals())
         ProxyEnv.__init__(self, env)
+        self.action_dim = self.action_space.flat_dim
+        self.spec = super().spec()
         self._scale_reward = scale_reward
         self._normalize_obs = normalize_obs
         self._normalize_reward = normalize_reward
@@ -90,6 +92,9 @@ class NormalizedEnv(ProxyEnv, Serializable):
         if self._normalize_reward:
             reward = self._apply_normalize_reward(reward)
         return Step(next_obs, reward * self._scale_reward, done, **info)
+
+    def log_diagnostics(self, paths):
+        return super().log_diagnostics(paths)
 
     def __str__(self):
         return "Normalized: %s" % self._wrapped_env

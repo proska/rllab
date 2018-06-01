@@ -1,11 +1,12 @@
-import pygame
+from gym import Env
 import numpy as np
+import pygame
 
 from dm_control import suite
 from dm_control.rl.environment import StepType
 from dm_control.rl.control import flatten_observation
 
-from rllab.envs import Env, Step
+from rllab.envs import EnvSpec, Step
 from rllab.envs.dm_control_viewer import DmControlViewer
 from rllab.core import Serializable
 from rllab.spaces import Box
@@ -81,3 +82,15 @@ class DmControlEnv(Env, Serializable):
     @property
     def total_reward(self):
         return self._total_reward
+
+    def action_dim(self):
+        return self.action_space.flat_dim
+
+    def spec(self):
+        return EnvSpec(
+            observation_space=self.observation_space,
+            action_space=self.action_space,
+        )
+
+    def log_diagnostics(self, paths):
+        pass

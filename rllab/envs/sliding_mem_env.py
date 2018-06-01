@@ -21,6 +21,8 @@ class SlidingMemEnv(ProxyEnv, Serializable):
         self.n_steps = n_steps
         self.axis = axis
         self.buffer = None
+        self.action_dim = self.action_space.flat_dim
+        self.spec = super().spec()
 
     def reset_buffer(self, new_):
         assert self.axis == 0
@@ -54,3 +56,5 @@ class SlidingMemEnv(ProxyEnv, Serializable):
         self.add_to_buffer(next_obs)
         return Step(self.buffer, reward, done, **info)
 
+    def log_diagnostics(self, paths):
+        return super().log_diagnostics(paths)

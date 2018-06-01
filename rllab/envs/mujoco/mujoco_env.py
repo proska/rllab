@@ -4,6 +4,7 @@ import os.path as osp
 import warnings
 
 from cached_property import cached_property
+from gym import Env
 import mako.template
 import mako.lookup
 import mujoco_py
@@ -15,7 +16,7 @@ import numpy as np
 import theano
 
 from rllab import spaces
-from rllab.envs import Env
+from rllab.envs import EnvSpec
 from rllab.misc.overrides import overrides
 from rllab.misc import autoargs
 from rllab.misc import logger
@@ -230,3 +231,15 @@ class MujocoEnv(Env):
 
     def action_from_key(self, key):
         raise NotImplementedError
+
+    def action_dim(self):
+        return self.action_space.flat_dim
+
+    def spec(self):
+        return EnvSpec(
+            observation_space=self.observation_space,
+            action_space=self.action_space,
+        )
+
+    def log_diagnostics(self, paths):
+        pass

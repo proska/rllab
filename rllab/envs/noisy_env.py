@@ -19,6 +19,7 @@ class NoisyObservationEnv(ProxyEnv, Serializable):
         super(NoisyObservationEnv, self).__init__(env)
         Serializable.quick_init(self, locals())
         self.obs_noise = obs_noise
+        self.action_dim = self.action_space.flat_dim
 
     def get_obs_noise_scale_factor(self, obs):
         # return np.abs(obs)
@@ -60,6 +61,7 @@ class DelayedActionEnv(ProxyEnv, Serializable):
         Serializable.quick_init(self, locals())
         self.action_delay = action_delay
         self._queued_actions = None
+        self.spec = super().spec()
 
     @overrides
     def reset(self):
@@ -77,3 +79,5 @@ class DelayedActionEnv(ProxyEnv, Serializable):
         ])
         return Step(next_obs, reward, done, **info)
 
+    def log_diagnostics(self, paths):
+        return super().log_diagnostics(paths)

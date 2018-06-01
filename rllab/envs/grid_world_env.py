@@ -1,7 +1,8 @@
+from gym import Env
 import numpy as np
-from .base import Env
+
 from rllab.spaces import Discrete
-from rllab.envs import Step
+from rllab.envs import EnvSpec, Step
 from rllab.core import Serializable
 
 MAPS = {
@@ -148,3 +149,14 @@ class GridWorldEnv(Env, Serializable):
     def observation_space(self):
         return Discrete(self.n_row * self.n_col)
 
+    def action_dim(self):
+        return self.action_space.flat_dim
+
+    def spec(self):
+        return EnvSpec(
+            observation_space=self.observation_space,
+            action_space=self.action_space,
+        )
+
+    def log_diagnostics(self, paths):
+        pass

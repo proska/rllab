@@ -22,6 +22,7 @@ class CartpoleEnv(Box2DEnv, Serializable):
         )
         self.cart = find_body(self.world, "cart")
         self.pole = find_body(self.world, "pole")
+        self.spec = super().spec()
         Serializable.__init__(self, *args, **kwargs)
 
     @overrides
@@ -55,3 +56,5 @@ class CartpoleEnv(Box2DEnv, Serializable):
         return abs(self.cart.position[0]) > self.max_cart_pos or \
             abs(self.pole.angle) > self.max_pole_angle
 
+    def log_diagnostics(self, paths):
+        return super().log_diagnostics(paths)

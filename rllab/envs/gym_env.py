@@ -2,6 +2,7 @@ import gym
 import gym.wrappers
 import gym.envs
 import gym.spaces
+from gym import Env
 import traceback
 import logging
 
@@ -14,7 +15,7 @@ except Exception as e:
 
 import os
 import os.path as osp
-from rllab.envs import Env, Step
+from rllab.envs import Step
 from rllab.core import Serializable
 from rllab.spaces import Box
 from rllab.spaces import Discrete

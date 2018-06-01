@@ -1,13 +1,13 @@
-
-
-from rllab.envs import Env, Step
-from rllab.policies import GaussianMLPPolicy
-from rllab.baselines import ZeroBaseline
-from rllab.algos import TRPO
-from rllab.spaces import Box
+from gym import Env
 import lasagne.nonlinearities
 import numpy as np
 import theano.tensor as TT
+
+from rllab.algos import TRPO
+from rllab.baselines import ZeroBaseline
+from rllab.envs import EnvSpec, Step
+from rllab.policies import GaussianMLPPolicy
+from rllab.spaces import Box
 
 
 class DummyEnv(Env):
@@ -25,6 +25,17 @@ class DummyEnv(Env):
     def step(self, action):
         return Step(observation=np.zeros(1), reward=np.random.normal(), done=True)
 
+    def action_dim(self):
+        return self.action_space.flat_dim
+
+    def spec(self):
+        return EnvSpec(
+            observation_space=self.observation_space,
+            action_space=self.action_space,
+        )
+
+    def log_diagnostics(self, paths):
+        pass
 
 def naive_relu(x):
     return TT.max(x, 0)
