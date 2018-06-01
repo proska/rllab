@@ -76,6 +76,7 @@ class GymEnv(Env, Serializable):
         env = gym.envs.make(env_name)
         self.env = env
         self.env_id = env.spec.id
+        self.action_dim = env.action_space.n
 
         assert not (not record_log and record_video)
 
@@ -114,7 +115,7 @@ class GymEnv(Env, Serializable):
 
     def reset(self):
         if self._force_reset and self.monitoring:
-            from gym.wrappers.monitoring import Monitor
+            from gym.wrappers.monitor import Monitor
             assert isinstance(self.env, Monitor)
             recorder = self.env.stats_recorder
             if recorder is not None:
@@ -127,6 +128,15 @@ class GymEnv(Env, Serializable):
 
     def render(self):
         self.env.render()
+
+    def spec(self):
+        return EnvSpec(
+            observation_space=self.observation_space,
+            action_space=self.action_space,
+        )
+
+    def log_diagnostics(self, paths):
+        pass
 
     def terminate(self):
         if self.monitoring:
