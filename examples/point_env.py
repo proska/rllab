@@ -1,7 +1,9 @@
-from rllab.envs import Env
-from rllab.spaces import Box
-from rllab.envs import Step
+from gym import Env
 import numpy as np
+
+from rllab.envs import EnvSpec, Step
+from rllab.spaces import Box
+from rllab.envs.env_spec import EnvSpec
 
 
 class PointEnv(Env):
@@ -28,3 +30,15 @@ class PointEnv(Env):
 
     def render(self):
         print('current state:', self._state)
+
+    def action_dim(self):
+        return self.action_space.flat_dim
+
+    def spec(self):
+        return EnvSpec(
+            observation_space=self.observation_space,
+            action_space=self.action_space,
+        )
+
+    def log_diagnostics(self, paths):
+        pass
