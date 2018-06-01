@@ -3,7 +3,9 @@ import collections
 
 from rllab.envs.env_spec import EnvSpec
 
-_Step = collections.namedtuple("Step", ["observation", "reward", "done", "info"])
+_Step = collections.namedtuple("Step",
+                               ["observation", "reward", "done", "info"])
+
 
 def Step(observation, reward, done, **kwargs):
     """

@@ -9,7 +9,6 @@ from rllab.spaces import Box
 
 
 class SlidingMemEnv(ProxyEnv, Serializable):
-
     def __init__(
             self,
             env,
@@ -37,12 +36,9 @@ class SlidingMemEnv(ProxyEnv, Serializable):
     @property
     def observation_space(self):
         origin = self._wrapped_env.observation_space
-        return Box(
-            *[
-                np.repeat(b, self.n_steps, axis=self.axis)
-                for b in origin.bounds
-            ]
-        )
+        return Box(*[
+            np.repeat(b, self.n_steps, axis=self.axis) for b in origin.bounds
+        ])
 
     @overrides
     def reset(self):

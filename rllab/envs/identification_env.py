@@ -4,7 +4,6 @@ from rllab.misc.overrides import overrides
 
 
 class IdentificationEnv(ProxyEnv, Serializable):
-
     def __init__(self, mdp_cls, mdp_args):
         Serializable.quick_init(self, locals())
         self.action_dim = self.action_space.flat_dim
