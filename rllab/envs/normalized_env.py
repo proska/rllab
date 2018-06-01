@@ -41,11 +41,11 @@ class NormalizedEnv(ProxyEnv, Serializable):
                 flat_obs - self._obs_mean)
 
     def _update_reward_estimate(self, reward):
-        self._reward_mean = (
+        self._reward_mean = (1 - self._reward_alpha
+                            ) * self._reward_mean + self._reward_alpha * reward
+        self._reward_var = (
             1 - self._reward_alpha
-        ) * self._reward_mean + self._reward_alpha * reward
-        self._reward_var = (1 - self._reward_alpha
-                            ) * self._reward_var + self._reward_alpha * np.square(
+        ) * self._reward_var + self._reward_alpha * np.square(
             reward - self._reward_mean)
 
     def _apply_normalize_obs(self, obs):
