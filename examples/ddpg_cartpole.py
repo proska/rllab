@@ -9,7 +9,6 @@ from rllab.q_functions import ContinuousMLPQFunction
 
 def run_task(*_):
     env = normalize(CartpoleEnv())
-    assert env.spec is not None
 
     policy = DeterministicMLPPolicy(
         env_spec=env.spec,
