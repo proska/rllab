@@ -11,9 +11,9 @@ from sandbox.rocky.tf.algos.trpo import TRPO
 from sandbox.rocky.tf.policies.gaussian_mlp_policy import GaussianMLPPolicy
 from sandbox.rocky.tf.envs.base import TfEnv
 
-from contrib.ros.envs.sawyer.example_launchers import model_dir
+from contrib.ros.envs.sawyer.launchers import model_dir
 from contrib.ros.envs.sawyer.pick_and_place_env import PickAndPlaceEnv
-from contrib.ros.util.task_object_manager import TaskObject, TaskObjectManager
+from contrib.ros.envs.sawyer.task_object_manager import TaskObject, TaskObjectManager
 
 
 def run_task(*_):
