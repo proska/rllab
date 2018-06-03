@@ -174,7 +174,7 @@ class PickAndPlaceEnv(RosEnv, Serializable):
                      'achieved_goal': achieved_goal,
                      'desired_goal': self.goal}
         """
-        robot_obs = self._robot.get_observation()
+        robot_obs = self._sawyer.get_observation()
 
         manipulatable_obs = self.task_obj_mgr.get_manipulatables_observation()
 
