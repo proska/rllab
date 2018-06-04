@@ -3,7 +3,7 @@
 import numpy as np
 from rllab.misc import special
 from rllab.misc import tensor_utils
-from rllab.algos import util
+from rllab.sampler import utils
 import rllab.misc.logger as logger
 
 
@@ -80,10 +80,10 @@ class BaseSampler(Sampler):
             agent_infos = tensor_utils.concat_tensor_dict_list([path["agent_infos"] for path in paths])
 
             if self.algo.center_adv:
-                advantages = util.center_advantages(advantages)
+                advantages = utils.center_advantages(advantages)
 
             if self.algo.positive_adv:
-                advantages = util.shift_advantages_to_positive(advantages)
+                advantages = utils.shift_advantages_to_positive(advantages)
 
             average_discounted_return = \
                 np.mean([path["returns"][0] for path in paths])
