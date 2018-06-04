@@ -41,3 +41,11 @@ def rollout(env, agent, max_path_length=np.inf, animated=False, speedup=1,
         agent_infos=tensor_utils.stack_tensor_dict_list(agent_infos),
         env_infos=tensor_utils.stack_tensor_dict_list(env_infos),
     )
+
+
+def center_advantages(advantages):
+    return (advantages - np.mean(advantages)) / (advantages.std() + 1e-8)
+
+
+def shift_advantages_to_positive(advantages):
+    return (advantages - np.min(advantages)) + 1e-8
