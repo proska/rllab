@@ -4,14 +4,6 @@ from rllab.core import Serializable
 from rllab.misc.ext import extract
 
 
-def center_advantages(advantages):
-    return (advantages - np.mean(advantages)) / (advantages.std() + 1e-8)
-
-
-def shift_advantages_to_positive(advantages):
-    return (advantages - np.min(advantages)) + 1e-8
-
-
 def sign(x):
     return 1. * (x >= 0) - 1. * (x < 0)
 
