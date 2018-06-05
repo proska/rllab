@@ -5,7 +5,6 @@ import mako.lookup
 import mako.template
 import numpy as np
 
-from rllab import spaces
 from rllab.envs import Step
 from rllab.envs.env_spec import EnvSpec
 from rllab.envs.box2d.box2d_viewer import Box2DViewer
@@ -69,7 +68,7 @@ class Box2DEnv(gym.Env):
         self._position_ids = None
         self._cached_obs = None
         self._cached_coms = {}
-        self.action_dim = self.action_space.flat_dim
+        self._action_dim = np.prod(self.action_space.shape)
 
     def model_path(self, file_name):
         return osp.abspath(
@@ -112,7 +111,7 @@ class Box2DEnv(gym.Env):
             [control.ctrllimit[0] for control in self.extra_data.controls])
         ub = np.array(
             [control.ctrllimit[1] for control in self.extra_data.controls])
-        return spaces.Box(lb, ub)
+        return gym.spaces.Box(low=lb, high=ub)
 
     @property
     @overrides
@@ -122,16 +121,16 @@ class Box2DEnv(gym.Env):
         else:
             d = len(self.extra_data.states)
         ub = BIG * np.ones(d)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(low=ub * -1, high=ub)
 
     @property
     def action_bounds(self):
-        return self.action_space.bounds
+        return self.action_space.low, self.action_space.high
 
     def forward_dynamics(self, action):
-        if len(action) != self.action_dim:
+        if len(action) != self._action_dim:
             raise ValueError('incorrect action dimension: expected %d but got '
-                             '%d' % (self.action_dim, len(action)))
+                             '%d' % (self._action_dim, len(action)))
         lb, ub = self.action_bounds
         action = np.clip(action, lb, ub)
         for ctrl, act in zip(self.extra_data.controls, action):

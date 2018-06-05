@@ -1,7 +1,7 @@
+import gym
 from cached_property import cached_property
 import numpy as np
 
-from rllab import spaces
 from rllab.core import Serializable
 from rllab.envs import Step
 from rllab.envs.mujoco import MujocoEnv
@@ -56,7 +56,7 @@ class OcclusionEnv(ProxyEnv, Serializable):
     def observation_space(self):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub)
 
     @overrides
     def reset(self):

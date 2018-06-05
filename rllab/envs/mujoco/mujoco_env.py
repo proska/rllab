@@ -15,7 +15,6 @@ from mujoco_py import MjViewer
 import numpy as np
 import theano
 
-from rllab import spaces
 from rllab.envs.env_spec import EnvSpec
 from rllab.misc.overrides import overrides
 from rllab.misc import autoargs
@@ -92,14 +91,14 @@ class MujocoEnv(gym.Env):
         bounds = self.model.actuator_ctrlrange
         lb = bounds[:, 0]
         ub = bounds[:, 1]
-        return spaces.Box(lb, ub)
+        return gym.spaces.Box(lb, ub)
 
     @cached_property
     @overrides
     def observation_space(self):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub)
 
     @property
     def action_bounds(self):
@@ -231,9 +230,6 @@ class MujocoEnv(gym.Env):
 
     def action_from_key(self, key):
         raise NotImplementedError
-
-    def action_dim(self):
-        return self.action_space.flat_dim
 
     @property
     def spec(self):

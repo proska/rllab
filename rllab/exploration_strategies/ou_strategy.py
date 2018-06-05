@@ -1,10 +1,11 @@
+import gym
+import numpy as np
+import numpy.random as nr
+
 from rllab.misc.overrides import overrides
 from rllab.misc import AttrDict
 from rllab.core import Serializable
-from rllab.spaces import Box
 from rllab.exploration_strategies import ExplorationStrategy
-import numpy as np
-import numpy.random as nr
 
 
 class OUStrategy(ExplorationStrategy, Serializable):
@@ -17,7 +18,7 @@ class OUStrategy(ExplorationStrategy, Serializable):
     """
 
     def __init__(self, env_spec, mu=0, theta=0.15, sigma=0.3, **kwargs):
-        assert isinstance(env_spec.action_space, Box)
+        assert isinstance(env_spec.action_space, gym.spaces.Box)
         assert len(env_spec.action_space.shape) == 1
         Serializable.quick_init(self, locals())
         self.mu = mu
@@ -54,7 +55,7 @@ class OUStrategy(ExplorationStrategy, Serializable):
 
 
 if __name__ == "__main__":
-    ou = OUStrategy(env_spec=AttrDict(action_space=Box(low=-1, high=1, shape=(1,))), mu=0, theta=0.15, sigma=0.3)
+    ou = OUStrategy(env_spec=AttrDict(action_space=gym.spaces.Box(low=-1, high=1, shape=(1,))), mu=0, theta=0.15, sigma=0.3)
     states = []
     for i in range(1000):
         states.append(ou.evolve_state()[0])

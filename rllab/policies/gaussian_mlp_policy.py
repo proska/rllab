@@ -1,3 +1,4 @@
+import gym
 import lasagne
 import lasagne.layers as L
 import lasagne.nonlinearities as NL
@@ -6,7 +7,6 @@ import numpy as np
 from rllab.core import ParamLayer
 from rllab.core import LasagnePowered
 from rllab.core import MLP
-from rllab.spaces import Box
 
 from rllab.core import Serializable
 from rllab.policies import StochasticPolicy
@@ -52,7 +52,7 @@ class GaussianMLPPolicy(StochasticPolicy, LasagnePowered):
         :return:
         """
         Serializable.quick_init(self, locals())
-        assert isinstance(env_spec.action_space, Box)
+        assert isinstance(env_spec.action_space, gym.spaces.Box)
 
         obs_dim = env_spec.observation_space.flat_dim
         action_dim = env_spec.action_space.flat_dim

@@ -4,8 +4,9 @@ import os.path as osp
 import tempfile
 import xml.etree.ElementTree as ET
 
-import mujoco_py
 import glfw
+import gym
+import mujoco_py
 # https://github.com/openai/mujoco-py/blob/6ac6ac203a875ef35b1505827264cadccbfd9f05/mujoco_py/builder.py#L61
 from mujoco_py import functions
 from mujoco_py import load_model_from_path
@@ -14,7 +15,6 @@ from mujoco_py import MjViewer
 import numpy as np
 
 from rllab.misc import logger
-from rllab import spaces
 from rllab.core import Serializable
 from rllab.envs.proxy_env import ProxyEnv
 from rllab.envs import Step
@@ -351,20 +351,20 @@ class GatherEnv(ProxyEnv, Serializable):
     def observation_space(self):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub)
 
     # space of only the robot observations (they go first in the get current obs)
     @property
     def robot_observation_space(self):
         shp = self.get_current_robot_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub)
 
     @property
     def maze_observation_space(self):
         shp = np.concatenate(self.get_readings()).shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub)
 
     @property
     @overrides

@@ -3,17 +3,16 @@ import numpy as np
 
 from rllab.envs import Step
 from rllab.envs.env_spec import EnvSpec
-from rllab.spaces import Box
 
 
 class PointEnv(gym.Env):
     @property
     def observation_space(self):
-        return Box(low=-np.inf, high=np.inf, shape=(2, ))
+        return gym.spaces.Box(low=-np.inf, high=np.inf, shape=(2, ))
 
     @property
     def action_space(self):
-        return Box(low=-0.1, high=0.1, shape=(2, ))
+        return gym.spaces.Box(low=-0.1, high=0.1, shape=(2, ))
 
     def reset(self):
         self._state = np.random.uniform(-1, 1, size=(2, ))
@@ -30,9 +29,6 @@ class PointEnv(gym.Env):
 
     def render(self):
         print('current state:', self._state)
-
-    def action_dim(self):
-        return self.action_space.flat_dim
 
     def spec(self):
         return EnvSpec(

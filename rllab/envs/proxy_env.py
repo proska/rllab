@@ -46,9 +46,6 @@ class ProxyEnv(gym.Env, Serializable):
     def set_param_values(self, params):
         self._wrapped_env.set_param_values(params)
 
-    def action_dim(self):
-        return self.action_space.flat_dim
-
     @property
     def spec(self):
         return EnvSpec(

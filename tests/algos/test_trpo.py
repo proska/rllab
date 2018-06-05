@@ -8,17 +8,16 @@ from rllab.baselines import ZeroBaseline
 from rllab.envs import Step
 from rllab.envs.env_spec import EnvSpec
 from rllab.policies import GaussianMLPPolicy
-from rllab.spaces import Box
 
 
 class DummyEnv(gym.Env):
     @property
     def observation_space(self):
-        return Box(low=-np.inf, high=np.inf, shape=(1, ))
+        return gym.spaces.Box(low=-np.inf, high=np.inf, shape=(1, ))
 
     @property
     def action_space(self):
-        return Box(low=-5.0, high=5.0, shape=(1, ))
+        return gym.spaces.Box(low=-5.0, high=5.0, shape=(1, ))
 
     def reset(self):
         return np.zeros(1)
@@ -26,9 +25,6 @@ class DummyEnv(gym.Env):
     def step(self, action):
         return Step(
             observation=np.zeros(1), reward=np.random.normal(), done=True)
-
-    def action_dim(self):
-        return self.action_space.flat_dim
 
     def spec(self):
         return EnvSpec(

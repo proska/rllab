@@ -1,7 +1,8 @@
-from rllab.core import Serializable
-from rllab.spaces import Box
-from rllab.exploration_strategies import ExplorationStrategy
+import gym
 import numpy as np
+
+from rllab.core import Serializable
+from rllab.exploration_strategies import ExplorationStrategy
 
 
 class GaussianStrategy(ExplorationStrategy, Serializable):
@@ -10,7 +11,7 @@ class GaussianStrategy(ExplorationStrategy, Serializable):
     """
 
     def __init__(self, env_spec, max_sigma=1.0, min_sigma=0.1, decay_period=1000000):
-        assert isinstance(env_spec.action_space, Box)
+        assert isinstance(env_spec.action_space, gym.spaces.Box)
         assert len(env_spec.action_space.shape) == 1
         Serializable.quick_init(self, locals())
         self._max_sigma = max_sigma

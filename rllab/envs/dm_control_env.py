@@ -10,7 +10,6 @@ from rllab.envs import Step
 from rllab.envs.env_spec import EnvSpec
 from rllab.envs.dm_control_viewer import DmControlViewer
 from rllab.core import Serializable
-from rllab.spaces import Box
 from rllab.spaces import Discrete
 
 
@@ -73,19 +72,16 @@ class DmControlEnv(gym.Env, Serializable):
                                               np.inf in action_spec.maximum):
             return Discrete(np.prod(action_spec.shape))
         else:
-            return Box(action_spec.minimum, action_spec.maximum)
+            return gym.spaces.Box(action_spec.minimum, action_spec.maximum)
 
     @property
     def observation_space(self):
         flat_dim = self._flat_shape(self._env.observation_spec())
-        return Box(low=-np.inf, high=np.inf, shape=[flat_dim])
+        return gym.spaces.Box(low=-np.inf, high=np.inf, shape=[flat_dim])
 
     @property
     def total_reward(self):
         return self._total_reward
-
-    def action_dim(self):
-        return self.action_space.flat_dim
 
     def spec(self):
         return EnvSpec(

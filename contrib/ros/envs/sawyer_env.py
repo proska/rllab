@@ -4,11 +4,11 @@ Every specific sawyer task environment should inherit it.
 """
 
 from geometry_msgs.msg import Pose, Point
+import gym
 import numpy as np
 
 from rllab.core.serializable import Serializable
 from rllab.envs.base import Step
-from rllab.spaces import Box
 
 from contrib.ros.envs.ros_env import RosEnv
 from contrib.ros.robots.sawyer import Sawyer
@@ -165,7 +165,7 @@ class SawyerEnv(RosEnv, Serializable):
         """
         Returns a Space object
         """
-        return Box(
+        return gym.spaces.Box(
             -np.inf, np.inf, shape=self.get_observation()['observation'].shape)
 
     # ================================================

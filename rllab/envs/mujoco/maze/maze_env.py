@@ -1,10 +1,10 @@
+import gym
+import math
+import numpy as np
 import os.path as osp
 import tempfile
 import xml.etree.ElementTree as ET
-import math
-import numpy as np
 
-from rllab import spaces
 from rllab.envs import Step
 from rllab.envs.proxy_env import ProxyEnv
 from rllab.envs.mujoco.maze.maze_env_utils import construct_maze
@@ -236,20 +236,20 @@ class MazeEnv(ProxyEnv, Serializable):
     def observation_space(self):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub)
 
     # space of only the robot observations (they go first in the get current obs) THIS COULD GO IN PROXYENV
     @property
     def robot_observation_space(self):
         shp = self.get_current_robot_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub)
 
     @property
     def maze_observation_space(self):
         shp = self.get_current_maze_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub)
 
     def _find_robot(self):
         structure = self.MAZE_STRUCTURE
