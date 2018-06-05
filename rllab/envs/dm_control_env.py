@@ -1,4 +1,4 @@
-from gym import Env
+import gym
 import numpy as np
 import pygame
 
@@ -14,9 +14,9 @@ from rllab.spaces import Box
 from rllab.spaces import Discrete
 
 
-class DmControlEnv(Env, Serializable):
+class DmControlEnv(gym.Env, Serializable):
     '''
-    This environment will use dm_control toolkit(https://arxiv.org/pdf/1801.00690.pdf) 
+    This environment will use dm_control toolkit(https://arxiv.org/pdf/1801.00690.pdf)
     to train and simulate your models.
     '''
 

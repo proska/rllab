@@ -7,10 +7,10 @@ _Step = collections.namedtuple("Step",
                                ["observation", "reward", "done", "info"])
 
 
-def Step(observation, reward, done, **kwargs):
+def Step(observation, reward, done, **info):
     """
     Convenience method creating a namedtuple with the results of the
     environment.step method.
-    Put extra diagnostic info in the kwargs
+    Put extra diagnostic info
     """
-    return _Step(observation, reward, done, kwargs)
+    return _Step(observation, reward, done, info)

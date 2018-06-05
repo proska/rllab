@@ -63,7 +63,6 @@ class DelayedActionEnv(ProxyEnv, Serializable):
         Serializable.quick_init(self, locals())
         self.action_delay = action_delay
         self._queued_actions = None
-        self.spec = super().spec()
 
     @overrides
     def reset(self):
@@ -78,6 +77,3 @@ class DelayedActionEnv(ProxyEnv, Serializable):
         self._queued_actions = np.concatenate(
             [self._queued_actions[self.action_dim:], action])
         return Step(next_obs, reward, done, **info)
-
-    def log_diagnostics(self, paths):
-        return super().log_diagnostics(paths)

@@ -1,6 +1,6 @@
 import os.path as osp
 
-from gym import Env
+import gym
 import mako.lookup
 import mako.template
 import numpy as np
@@ -17,7 +17,7 @@ from rllab.misc.overrides import overrides
 BIG = 1e6
 
 
-class Box2DEnv(Env):
+class Box2DEnv(gym.Env):
     @autoargs.arg("frame_skip", type=int, help="Number of frames to skip")
     @autoargs.arg(
         'position_only',
@@ -368,11 +368,13 @@ class Box2DEnv(Env):
     def action_from_keys(self, keys):
         raise NotImplementedError
 
+    @property
     def spec(self):
         return EnvSpec(
             observation_space=self.observation_space,
             action_space=self.action_space,
         )
 
+    @property
     def log_diagnostics(self, paths):
         pass

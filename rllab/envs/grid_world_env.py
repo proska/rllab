@@ -1,5 +1,6 @@
+import gym
 import numpy as np
-from .base import Env
+
 from rllab.spaces import Discrete
 from rllab.envs import Step
 from rllab.core import Serializable
@@ -33,7 +34,7 @@ MAPS = {
 }
 
 
-class GridWorldEnv(Env, Serializable):
+class GridWorldEnv(gym.Env, Serializable):
     """
     'S' : starting point
     'F' or '.': free space

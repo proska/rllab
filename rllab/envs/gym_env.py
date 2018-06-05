@@ -2,7 +2,7 @@ import gym
 import gym.wrappers
 import gym.envs
 import gym.spaces
-from gym import Env
+
 import traceback
 import logging
 
@@ -56,7 +56,7 @@ class NoVideoSchedule(object):
         return False
 
 
-class GymEnv(Env, Serializable):
+class GymEnv(gym.Env, Serializable):
     def __init__(self,
                  env_name,
                  record_video=True,

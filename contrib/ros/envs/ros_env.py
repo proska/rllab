@@ -1,12 +1,12 @@
+import gym
 import numpy as np
 import rospy
 
 from rllab.core.serializable import Serializable
-from rllab.envs.base import Env
 from rllab.misc.ext import get_seed
 
 
-class RosEnv(Env, Serializable):
+class RosEnv(gym.Env, Serializable):
     """
     Superclass for all ros environment
     """

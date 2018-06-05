@@ -4,7 +4,7 @@ import os.path as osp
 import warnings
 
 from cached_property import cached_property
-from gym import Env
+import gym
 import mako.template
 import mako.lookup
 import mujoco_py
@@ -41,7 +41,7 @@ def q_mult(a, b):  # multiply two quaternion
     return [w, i, j, k]
 
 
-class MujocoEnv(Env):
+class MujocoEnv(gym.Env):
     FILE = None
 
     @autoargs.arg(
@@ -235,11 +235,13 @@ class MujocoEnv(Env):
     def action_dim(self):
         return self.action_space.flat_dim
 
+    @property
     def spec(self):
         return EnvSpec(
             observation_space=self.observation_space,
             action_space=self.action_space,
         )
 
+    @property
     def log_diagnostics(self, paths):
         pass

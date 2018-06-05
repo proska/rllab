@@ -21,7 +21,6 @@ class Walker2DEnv(MujocoEnv, Serializable):
     def __init__(self, ctrl_cost_coeff=1e-2, *args, **kwargs):
         self.ctrl_cost_coeff = ctrl_cost_coeff
         self.action_dim = self.action_space.flat_dim
-        self.spec = super().spec()
         super(Walker2DEnv, self).__init__(*args, **kwargs)
         Serializable.quick_init(self, locals())
 
@@ -57,6 +56,3 @@ class Walker2DEnv(MujocoEnv, Serializable):
         logger.record_tabular('MaxForwardProgress', np.max(progs))
         logger.record_tabular('MinForwardProgress', np.min(progs))
         logger.record_tabular('StdForwardProgress', np.std(progs))
-
-    def log_diagnostics(self, paths):
-        return super().log_diagnostics(paths)

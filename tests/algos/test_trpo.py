@@ -1,4 +1,4 @@
-from gym import Env
+import gym
 import lasagne.nonlinearities
 import numpy as np
 import theano.tensor as TT
@@ -11,7 +11,7 @@ from rllab.policies import GaussianMLPPolicy
 from rllab.spaces import Box
 
 
-class DummyEnv(Env):
+class DummyEnv(gym.Env):
     @property
     def observation_space(self):
         return Box(low=-np.inf, high=np.inf, shape=(1, ))

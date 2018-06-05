@@ -1,4 +1,4 @@
-from gym import Env
+import gym
 import numpy as np
 
 from rllab.envs import Step
@@ -6,7 +6,7 @@ from rllab.envs.env_spec import EnvSpec
 from rllab.spaces import Box
 
 
-class PointEnv(Env):
+class PointEnv(gym.Env):
     @property
     def observation_space(self):
         return Box(low=-np.inf, high=np.inf, shape=(2, ))

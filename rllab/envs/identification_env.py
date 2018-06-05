@@ -10,7 +10,6 @@ class IdentificationEnv(ProxyEnv, Serializable):
         self.mdp_cls = mdp_cls
         self.mdp_args = dict(mdp_args)
         self.mdp_args["template_args"] = dict(noise=True)
-        self.spec = super().spec()
         mdp = self.gen_mdp()
         super(IdentificationEnv, self).__init__(mdp)
 
@@ -24,6 +23,3 @@ class IdentificationEnv(ProxyEnv, Serializable):
                 self._wrapped_env.release()
         self._wrapped_env = self.gen_mdp()
         return super(IdentificationEnv, self).reset()
-
-    def log_diagnostics(self, paths):
-        return super().log_diagnostics(paths)

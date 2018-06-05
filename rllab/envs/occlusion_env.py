@@ -25,7 +25,6 @@ class OcclusionEnv(ProxyEnv, Serializable):
         self._set_sensor_mask(env, sensor_idx)
         super(OcclusionEnv, self).__init__(env)
         self._dt = 1
-        self.spec = super().spec()
         if isinstance(env, MujocoEnv):
             self._dt = env.sim.opt.timestep * env.frame_skip
 

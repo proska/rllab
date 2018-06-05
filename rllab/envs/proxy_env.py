@@ -1,10 +1,10 @@
-from gym import Env
+import gym
 
 from rllab.core import Serializable
 from rllab.envs.env_spec import EnvSpec
 
 
-class ProxyEnv(Env, Serializable):
+class ProxyEnv(gym.Env, Serializable):
     def __init__(self, wrapped_env):
         Serializable.quick_init(self, locals())
         self._wrapped_env = wrapped_env
@@ -49,11 +49,13 @@ class ProxyEnv(Env, Serializable):
     def action_dim(self):
         return self.action_space.flat_dim
 
+    @property
     def spec(self):
         return EnvSpec(
             observation_space=self.observation_space,
             action_space=self.action_space,
         )
 
+    @property
     def log_diagnostics(self, paths):
         pass
