@@ -1,7 +1,6 @@
 import gym
 import numpy as np
 
-from rllab.spaces import Discrete
 from rllab.envs import Step
 from rllab.core import Serializable
 
@@ -143,9 +142,9 @@ class GridWorldEnv(gym.Env, Serializable):
 
     @property
     def action_space(self):
-        return Discrete(4)
+        return gym.spaces.Discrete(4)
 
     @property
     def observation_space(self):
-        return Discrete(self.n_row * self.n_col)
+        return gym.spaces.Discrete(self.n_row * self.n_col)
 

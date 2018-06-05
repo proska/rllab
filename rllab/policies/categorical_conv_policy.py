@@ -1,17 +1,17 @@
-from rllab.core import LasagnePowered
-import lasagne.layers as L
-from rllab.core import ConvNetwork
-from rllab.distributions import Categorical
-from rllab.policies import StochasticPolicy
-from rllab.misc import tensor_utils
-from rllab.spaces import Discrete
-
-from rllab.core import Serializable
-from rllab.misc import ext
-from rllab.misc import logger
-from rllab.misc.overrides import overrides
+import gym
 import numpy as np
 import lasagne.nonlinearities as NL
+
+import lasagne.layers as L
+from rllab.core import ConvNetwork
+from rllab.core import LasagnePowered
+from rllab.core import Serializable
+from rllab.distributions import Categorical
+from rllab.policies import StochasticPolicy
+from rllab.misc import ext
+from rllab.misc import logger
+from rllab.misc import tensor_utils
+from rllab.misc.overrides import overrides
 
 
 class CategoricalConvPolicy(StochasticPolicy, LasagnePowered):
@@ -35,7 +35,7 @@ class CategoricalConvPolicy(StochasticPolicy, LasagnePowered):
         """
         Serializable.quick_init(self, locals())
 
-        assert isinstance(env_spec.action_space, Discrete)
+        assert isinstance(env_spec.action_space, gym.spaces.Discrete)
 
         self._env_spec = env_spec
 

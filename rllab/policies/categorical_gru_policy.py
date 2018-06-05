@@ -1,3 +1,4 @@
+import gym
 import lasagne.layers as L
 import lasagne.nonlinearities as NL
 import numpy as np
@@ -9,7 +10,6 @@ from rllab.core import OpLayer
 from rllab.core import Serializable
 from rllab.distributions import RecurrentCategorical
 from rllab.misc import ext
-from rllab.spaces import Discrete
 from rllab.misc import special
 from rllab.misc.overrides import overrides
 from rllab.policies import StochasticPolicy
@@ -29,7 +29,7 @@ class CategoricalGRUPolicy(StochasticPolicy, LasagnePowered):
         :param hidden_nonlinearity: nonlinearity used for each hidden layer
         :return:
         """
-        assert isinstance(env_spec.action_space, Discrete)
+        assert isinstance(env_spec.action_space, gym.spaces.Discrete)
         Serializable.quick_init(self, locals())
         super(CategoricalGRUPolicy, self).__init__(env_spec)
 

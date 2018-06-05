@@ -1,17 +1,17 @@
 import gym
-from rllab.spaces import Product, Discrete
+from rllab.spaces import Product
 import numpy as np
 
 
 def test_product_space():
-    _ = Product([Discrete(3), Discrete(2)])
-    product_space = Product(Discrete(3), Discrete(2))
+    _ = Product([gym.spaces.Discrete(3), gym.spaces.Discrete(2)])
+    product_space = Product(gym.spaces.Discrete(3), gym.spaces.Discrete(2))
     sample = product_space.sample()
     assert product_space.contains(sample)
 
 
 def test_product_space_unflatten_n():
-    space = Product([Discrete(3), Discrete(3)])
+    space = Product([gym.spaces.Discrete(3), gym.spaces.Discrete(3)])
     np.testing.assert_array_equal(space.flatten((2, 2)), space.flatten_n([(2, 2)])[0])
     np.testing.assert_array_equal(
         space.unflatten(space.flatten((2, 2))),

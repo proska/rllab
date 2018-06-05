@@ -1,3 +1,4 @@
+import gym
 import lasagne.layers as L
 import lasagne.nonlinearities as NL
 
@@ -8,7 +9,6 @@ from rllab.distributions import Categorical
 from rllab.misc import ext
 from rllab.misc.overrides import overrides
 from rllab.policies import StochasticPolicy
-from rllab.spaces import Discrete
 
 import numpy as np
 
@@ -31,7 +31,7 @@ class CategoricalMLPPolicy(StochasticPolicy, LasagnePowered):
         """
         Serializable.quick_init(self, locals())
 
-        assert isinstance(env_spec.action_space, Discrete)
+        assert isinstance(env_spec.action_space, gym.spaces.Discrete)
 
         if prob_network is None:
             prob_network = MLP(
