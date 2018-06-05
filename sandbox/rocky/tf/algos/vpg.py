@@ -75,9 +75,19 @@ class VPG(BatchPolopt, Serializable):
             valid_var = None
 
         dist_info_vars = self.policy.dist_info_sym(obs_var, state_info_vars)
-        logli = dist.log_likelihood_sym(action_var, dist_info_vars)
-        kl = dist.kl_sym(old_dist_info_vars, dist_info_vars)
 
+        self.policy._loc = dist_info_vars["mean"]
+        self.policy._log_scale = dist_info_vars["log_std"]
+        self.policy._old_loc = old_dist_info_vars["mean"]
+        self.policy._old_log_scale = old_dist_info_vars["log_std"]
+        
+        #logli = dist.log_likelihood_sym(action_var, dist_info_vars)
+        logli = self.policy.tf_dist.log_prob(action_var)
+        logli = tf.reduce_sum(logli, axis=-1)
+
+        # kl = dist.kl_sym(old_dist_info_vars, dist_info_vars)
+        kl = self.policy.tf_dist.kl_divergence(self.policy.tf_old_dist)
+        kl = tf.reduce_sum(kl, axis=-1)
         # formulate as a minimization problem
         # The gradient of the surrogate objective is the policy gradient
         if is_recurrent:
@@ -96,7 +106,7 @@ class VPG(BatchPolopt, Serializable):
         self.optimizer.update_opt(loss=surr_obj, target=self.policy, inputs=input_list)
 
         f_kl = tensor_utils.compile_function(
-            inputs=input_list + old_dist_info_vars_list,
+            inputs=input_list + self.policy.old_dist_info_vars_list, #old_dist_info_vars_list,
             outputs=[mean_kl, max_kl],
         )
         self.opt_info = dict(

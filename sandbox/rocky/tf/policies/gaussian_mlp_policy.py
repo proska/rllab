@@ -12,6 +12,7 @@ from rllab.misc.overrides import overrides
 from rllab.misc import logger
 from sandbox.rocky.tf.misc import tensor_utils
 import tensorflow as tf
+from tensorflow.contrib.distributions import Normal
 
 
 class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
@@ -126,6 +127,20 @@ class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
             self._l_std_param = l_std_param
 
             self._dist = DiagonalGaussian(action_dim)
+            
+            # extra code for test
+            is_recurrent = int(self.recurrent)
+            self._mean = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [action_dim], name='norm.mean')
+            self._log_std = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [action_dim], name='norm.log_std')
+            self._std = tf.exp(self._log_std)
+            self._old_mean = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [action_dim], name='old_norm.mean')
+            self._old_log_std = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [action_dim], name='old_norm.log_std')
+            self._old_std = tf.exp(self._old_log_std)
+            self.old_dist_info_vars_list = [self._old_mean, self._old_log_std]
+            self.tf_dist = Normal(loc = self._mean, scale = self._std)
+            self.tf_old_dist = Normal(loc = self._old_mean, scale = self._old_std)
+
+
 
             LayersPowered.__init__(self, [l_mean, l_std_param])
             super(GaussianMLPPolicy, self).__init__(env_spec)
