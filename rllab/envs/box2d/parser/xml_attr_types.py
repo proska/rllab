@@ -4,6 +4,7 @@ import numpy as np
 
 
 class Type(object):
+
     def __eq__(self, other):
         return self.__class__ == other.__class__
 
@@ -12,22 +13,26 @@ class Type(object):
 
 
 class Float(Type):
+
     def from_str(self, s):
         return float(s)
 
 
 class Int(Type):
+
     def from_str(self, s):
         return int(s)
 
 
 class Hex(Type):
+
     def from_str(self, s):
         assert s.startswith("0x") or s.startswith("0X")
         return int(s, 16)
 
 
 class Choice(Type):
+
     def __init__(self, *options):
         self._options = options
 
@@ -39,6 +44,7 @@ class Choice(Type):
 
 
 class List(Type):
+
     def __init__(self, elem_type):
         self.elem_type = elem_type
 
@@ -57,6 +63,7 @@ class List(Type):
 
 
 class Tuple(Type):
+
     def __init__(self, *elem_types):
         self.elem_types = elem_types
 
@@ -73,13 +80,14 @@ class Tuple(Type):
             segments = s.split(" ")
         if len(segments) != len(self.elem_types):
             raise ValueError(
-                "Length mismatch: expected a tuple of length %d; got %s instead"
-                % (len(self.elem_types), s))
-        return tuple(
-            [typ.from_str(seg) for typ, seg in zip(self.elem_types, segments)])
+                "Length mismatch: expected a tuple of length %d; got %s instead" %
+                (len(self.elem_types), s))
+        return tuple([typ.from_str(seg)
+                      for typ, seg in zip(self.elem_types, segments)])
 
 
 class Either(Type):
+
     def __init__(self, *elem_types):
         self.elem_types = elem_types
 
@@ -93,11 +101,13 @@ class Either(Type):
 
 
 class String(Type):
+
     def from_str(self, s):
         return s
 
 
 class Angle(Type):
+
     def from_str(self, s):
         if s.endswith("deg"):
             return float(s[:-len("deg")]) * np.pi / 180.0
@@ -107,6 +117,7 @@ class Angle(Type):
 
 
 class Bool(Type):
+
     def from_str(self, s):
         return s.lower() == "true" or s.lower() == "1"
 

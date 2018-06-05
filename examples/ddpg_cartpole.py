@@ -13,7 +13,8 @@ def run_task(*_):
     policy = DeterministicMLPPolicy(
         env_spec=env.spec,
         # The neural network policy should have two hidden layers, each with 32 hidden units.
-        hidden_sizes=(32, 32))
+        hidden_sizes=(32, 32)
+    )
 
     es = OUStrategy(env_spec=env.spec)
 
@@ -37,7 +38,6 @@ def run_task(*_):
         # plot=True,
     )
     algo.train()
-
 
 run_experiment_lite(
     run_task,
