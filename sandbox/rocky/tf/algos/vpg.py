@@ -76,14 +76,14 @@ class VPG(BatchPolopt, Serializable):
 
         dist_info_vars = self.policy.dist_info_sym(obs_var, state_info_vars)
 
-        self.policy._loc = dist_info_vars["mean"]
-        self.policy._log_scale = dist_info_vars["log_std"]
-        self.policy._old_loc = old_dist_info_vars["mean"]
-        self.policy._old_log_scale = old_dist_info_vars["log_std"]
+        self.policy._mean = dist_info_vars["mean"]
+        self.policy._log_std = dist_info_vars["log_std"]
+        self.policy._old_mean = old_dist_info_vars["mean"]
+        self.policy._old_log_std = old_dist_info_vars["log_std"]
         
-        #logli = dist.log_likelihood_sym(action_var, dist_info_vars)
-        logli = self.policy.tf_dist.log_prob(action_var)
-        logli = tf.reduce_sum(logli, axis=-1)
+        logli = dist.log_likelihood_sym(action_var, dist_info_vars)
+        # logli = self.policy.tf_dist.log_prob(action_var)
+        # logli = tf.reduce_sum(logli, axis=-1)
 
         # kl = dist.kl_sym(old_dist_info_vars, dist_info_vars)
         kl = self.policy.tf_dist.kl_divergence(self.policy.tf_old_dist)
