@@ -81,6 +81,7 @@ class PickAndPlaceEnv(RosEnv, Serializable):
                             y=self.goal[target_idx * 3 + 1],
                             z=self.goal[target_idx * 3 + 2])))
                 target_idx += 1
+            self.reset_sim()
         else:
             # TODO(gh/8: Sawyer runtime support)
             pass

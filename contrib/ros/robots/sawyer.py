@@ -39,7 +39,7 @@ class Sawyer(Robot):
                  control_mode='position'):
         """
         :param initial_joint_pos: {str: float}
-                            {'joint_name': position_value}, and also initial_joint_pos should include all os the
+                            {'joint_name': position_value}, and also initial_joint_pos should include all of the
                             joints that user wants to control and observe.
         """
         Robot.__init__(self)
