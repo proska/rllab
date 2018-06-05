@@ -1,3 +1,4 @@
+import os.path as osp
 from rllab.envs.mujoco.half_cheetah_env import HalfCheetahEnv
 from rllab.envs.mujoco.hopper_env import HopperEnv
 from rllab.envs.mujoco.inverted_double_pendulum_env import InvertedDoublePendulumEnv
