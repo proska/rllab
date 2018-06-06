@@ -19,7 +19,6 @@ class NormalizedEnv(ProxyEnv, Serializable):
     ):
         Serializable.quick_init(self, locals())
         ProxyEnv.__init__(self, env)
-        self.action_dim = self.action_space.flat_dim
         self._scale_reward = scale_reward
         self._normalize_obs = normalize_obs
         self._normalize_reward = normalize_reward

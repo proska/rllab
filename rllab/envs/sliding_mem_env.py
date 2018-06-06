@@ -20,7 +20,6 @@ class SlidingMemEnv(ProxyEnv, Serializable):
         self.n_steps = n_steps
         self.axis = axis
         self.buffer = None
-        self.action_dim = self.action_space.flat_dim
 
     def reset_buffer(self, new_):
         assert self.axis == 0

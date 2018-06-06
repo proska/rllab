@@ -21,7 +21,6 @@ class OcclusionEnv(ProxyEnv, Serializable):
         '''
         Serializable.quick_init(self, locals())
 
-        self.action_dim = self.action_space.flat_dim
         self._set_sensor_mask(env, sensor_idx)
         super(OcclusionEnv, self).__init__(env)
         self._dt = 1

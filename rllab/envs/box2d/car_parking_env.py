@@ -35,6 +35,7 @@ class CarParkingEnv(Box2DEnv, Serializable):
         self.goal_radius = 1.
         self.vel_thres = 1e-1
         self.start_radius = 5.
+        self._action_dim = super(CarParkingEnv, self)._action_dim + 1
 
     @overrides
     def before_world_step(self, action):
@@ -54,11 +55,6 @@ class CarParkingEnv(Box2DEnv, Serializable):
             if mag != 0:
                 wheel.ApplyLinearImpulse(
                     0.1 * wheel.mass * -wheel.linearVelocity / mag**0.5, wheel.worldCenter, True)
-
-    @property
-    @overrides
-    def action_dim(self):
-        return super(CarParkingEnv, self).action_dim + 1
 
     @property
     @overrides
@@ -103,7 +99,7 @@ class CarParkingEnv(Box2DEnv, Serializable):
 
     @overrides
     def action_from_keys(self, keys):
-        go = np.zeros(self.action_dim)
+        go = np.zeros(self._action_dim)
         if keys[pygame.K_LEFT]:
             go[-1] = self.max_deg
         if keys[pygame.K_RIGHT]:
