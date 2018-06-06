@@ -36,11 +36,13 @@ learning_rate = 0.01
 observations_var = ext.new_tensor(
     name='observations',
     # It should have 1 extra dimension since we want to represent a list of observations
-    ndim=1+1
+    ndim=1+1,
+    dtype=theano.config.floatX
 )
 actions_var = ext.new_tensor(
     name='actions',
-    ndim=1+1
+    ndim=1+1,
+    dtype=theano.config.floatX
 )
 returns_var = TT.vector('returns')
 

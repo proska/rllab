@@ -32,13 +32,15 @@ class NPO(BatchPolopt):
     @overrides
     def init_opt(self):
         is_recurrent = int(self.policy.recurrent)
-        obs_var = self.env.observation_space.new_tensor_variable(
-            'obs',
-            extra_dims=1 + is_recurrent,
+        obs_var = ext.new_tensor(
+            name='obs',
+            ndims=1+1 + is_recurrent,
+            dtype=theano.config.floatX
         )
-        action_var = self.env.action_space.new_tensor_variable(
-            'action',
-            extra_dims=1 + is_recurrent,
+        action_var = ext.new_tensor(
+            name='action',
+            ndims=1+1 + is_recurrent,
+            dtype=theano.config.floatX
         )
         advantage_var = ext.new_tensor(
             'advantage',

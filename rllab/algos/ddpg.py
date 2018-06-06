@@ -1,16 +1,17 @@
+from functools import partial
+import lasagne
+import numpy as np
+import pickle as pickle
+import pyprind
+import theano.tensor as TT
+
 from rllab.algos import RLAlgorithm
 from rllab.misc.overrides import overrides
 from rllab.misc import special
 from rllab.misc import ext
-from rllab.sampler import parallel_sampler
-from rllab.plotter import plotter
-from functools import partial
 import rllab.misc.logger as logger
-import theano.tensor as TT
-import pickle as pickle
-import numpy as np
-import pyprind
-import lasagne
+from rllab.plotter import plotter
+from rllab.sampler import parallel_sampler
 
 
 def parse_update_method(update_method, **kwargs):
@@ -275,16 +276,18 @@ class DDPG(RLAlgorithm):
         target_qf = pickle.loads(pickle.dumps(self.qf))
 
         # y need to be computed first
-        obs = self.env.observation_space.new_tensor_variable(
-            'obs',
-            extra_dims=1,
+        obs = ext.new_tensor(
+            name='obs',
+            ndims=1+1,
+            dtype='uint32'
         )
 
         # The yi values are computed separately as above and then passed to
         # the training functions below
-        action = self.env.action_space.new_tensor_variable(
-            'action',
-            extra_dims=1,
+        action = ext.new_tensor(
+            name='action',
+            ndims=1+1,
+            dtype='uint32'
         )
         yvar = TT.vector('ys')
 

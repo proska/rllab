@@ -62,13 +62,15 @@ class REPS(BatchPolopt, Serializable):
         self.param_v = np.random.rand(obs_dim * 2 + 4)
 
         # Theano vars
-        obs_var = self.env.observation_space.new_tensor_variable(
+        obs_var = ext.new_tensor(
             'obs',
-            extra_dims=1 + is_recurrent,
+            ndim=1+1 + is_recurrent,
+            dtype=theano.config.floatX
         )
-        action_var = self.env.action_space.new_tensor_variable(
+        action_var = ext.new_tensor(
             'action',
-            extra_dims=1 + is_recurrent,
+            ndim=1+1 + is_recurrent,
+            dtype=theano.config.floatX
         )
         rewards = ext.new_tensor(
             'rewards',
