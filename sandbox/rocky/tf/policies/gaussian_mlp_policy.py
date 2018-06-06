@@ -126,22 +126,9 @@ class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
             self._l_mean = l_mean
             self._l_std_param = l_std_param
 
+            self._action_dim = action_dim
             self._dist = DiagonalGaussian(action_dim)
             
-            # extra code for test
-            is_recurrent = int(self.recurrent)
-            self._mean = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [action_dim], name='norm.mean')
-            self._log_std = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [action_dim], name='norm.log_std')
-            self._std = tf.exp(self._log_std)
-            self._old_mean = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [action_dim], name='old_norm.mean')
-            self._old_log_std = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [action_dim], name='old_norm.log_std')
-            self._old_std = tf.exp(self._old_log_std)
-            self.old_dist_info_vars_list = [self._old_mean, self._old_log_std]
-            self.tf_dist = Normal(loc = self._mean, scale = self._std)
-            self.tf_old_dist = Normal(loc = self._old_mean, scale = self._old_std)
-
-
-
             LayersPowered.__init__(self, [l_mean, l_std_param])
             super(GaussianMLPPolicy, self).__init__(env_spec)
 
@@ -153,6 +140,18 @@ class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
                 inputs=[obs_var],
                 outputs=[mean_var, log_std_var],
             )
+
+    def create_dist(self, dist_info_vars):
+        std = tf.exp(dist_info_vars["log_std"])
+        self.tf_dist = Normal(loc=dist_info_vars["mean"], scale=std)
+
+    def create_old_dist(self):
+        is_recurrent = int(self.recurrent)
+        mean = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [self._action_dim], name='old_mean')
+        log_std = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [self._action_dim], name='old_log_std')
+        std = tf.exp(log_std)
+        self.tf_old_dist = Normal(loc=mean, scale=std)
+        self.old_dist_info_vars_list = [mean, log_std]
 
     @property
     def vectorized(self):

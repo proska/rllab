@@ -55,14 +55,7 @@ class VPG(BatchPolopt, Serializable):
             ndim=1 + is_recurrent,
             dtype=tf.float32,
         )
-        dist = self.policy.distribution
-
-        old_dist_info_vars = {
-            k: tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + list(shape), name='old_%s' % k)
-            for k, shape in dist.dist_info_specs
-            }
-        old_dist_info_vars_list = [old_dist_info_vars[k] for k in dist.dist_info_keys]
-
+      
         state_info_vars = {
             k: tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + list(shape), name=k)
             for k, shape in self.policy.state_info_specs
@@ -76,18 +69,15 @@ class VPG(BatchPolopt, Serializable):
 
         dist_info_vars = self.policy.dist_info_sym(obs_var, state_info_vars)
 
-        self.policy._mean = dist_info_vars["mean"]
-        self.policy._log_std = dist_info_vars["log_std"]
-        self.policy._old_mean = old_dist_info_vars["mean"]
-        self.policy._old_log_std = old_dist_info_vars["log_std"]
+        self.policy.create_dist(dist_info_vars)
+        self.policy.create_old_dist()
         
-        logli = dist.log_likelihood_sym(action_var, dist_info_vars)
-        # logli = self.policy.tf_dist.log_prob(action_var)
-        # logli = tf.reduce_sum(logli, axis=-1)
+        logli = self.policy.tf_dist.log_prob(action_var)
+        logli = tf.reduce_sum(logli, axis=-1)
 
-        # kl = dist.kl_sym(old_dist_info_vars, dist_info_vars)
         kl = self.policy.tf_dist.kl_divergence(self.policy.tf_old_dist)
         kl = tf.reduce_sum(kl, axis=-1)
+
         # formulate as a minimization problem
         # The gradient of the surrogate objective is the policy gradient
         if is_recurrent:
@@ -106,7 +96,7 @@ class VPG(BatchPolopt, Serializable):
         self.optimizer.update_opt(loss=surr_obj, target=self.policy, inputs=input_list)
 
         f_kl = tensor_utils.compile_function(
-            inputs=input_list + self.policy.old_dist_info_vars_list, #old_dist_info_vars_list,
+            inputs=input_list + self.policy.old_dist_info_vars_list,
             outputs=[mean_kl, max_kl],
         )
         self.opt_info = dict(
