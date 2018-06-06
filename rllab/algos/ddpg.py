@@ -287,7 +287,7 @@ class DDPG(RLAlgorithm):
         action = ext.new_tensor(
             name='action',
             ndim=1+1,
-            dtype=
+            dtype='uint32'
         )
         yvar = TT.vector('ys')
 
