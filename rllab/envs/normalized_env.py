@@ -4,8 +4,8 @@ import numpy as np
 from rllab.core import Serializable
 from rllab.envs import Step
 from rllab.envs.proxy_env import ProxyEnv
+from rllab.misc import special
 from rllab.misc.overrides import overrides
-
 
 class NormalizedEnv(ProxyEnv, Serializable):
     def __init__(
@@ -23,14 +23,21 @@ class NormalizedEnv(ProxyEnv, Serializable):
         self._normalize_obs = normalize_obs
         self._normalize_reward = normalize_reward
         self._obs_alpha = obs_alpha
-        self._obs_mean = np.zeros(env.observation_space.flat_dim)
-        self._obs_var = np.ones(env.observation_space.flat_dim)
+        self._obs_mean = np.zeros(env.observation_space.n if \
+        isinstance(env.observation_space, gym.spaces.Discrete) \
+        else np.prod(env.observation_space.shape))
+
+        self._obs_var =  np.ones(env.observation_space.n if \
+        isinstance(env.observation_space, gym.spaces.Discrete) \
+        else np.prod(env.observation_space.shape))
+
         self._reward_alpha = reward_alpha
         self._reward_mean = 0.
         self._reward_var = 1.
 
     def _update_obs_estimate(self, obs):
-        flat_obs = self.wrapped_env.observation_space.flatten(obs)
+        flat_obs = special.to_onehot(obs,self.wrapped_env.observation_space.n) \
+        if isinstance(self.wrapped_env.observation_space, gym.spaces.Discrete) else np.asarray(obs).flatten()
         self._obs_mean = (
             1 - self._obs_alpha) * self._obs_mean + self._obs_alpha * flat_obs
         self._obs_var = (

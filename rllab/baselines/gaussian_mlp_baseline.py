@@ -21,8 +21,12 @@ class GaussianMLPBaseline(Baseline, Parameterized):
         if regressor_args is None:
             regressor_args = dict()
 
+        obs_dim = env_spec.observation_space.n if \
+                isinstance(env_spec.observation_space, gym.spaces.Discrete) \
+                else np.prod(env_spec.observation_space.shape)
+
         self._regressor = GaussianMLPRegressor(
-            input_shape=(env_spec.observation_space.flat_dim * num_seq_inputs,),
+            input_shape=(obs_dim * num_seq_inputs,),
             output_dim=1,
             name="vf",
             **regressor_args

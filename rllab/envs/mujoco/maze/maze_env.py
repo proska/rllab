@@ -332,8 +332,13 @@ class MazeEnv(ProxyEnv, Serializable):
             stripped_path = {}
             for k, v in path.items():
                 stripped_path[k] = v
+
+            obs_dim = self.wrapped_env.observation_space.n if \
+                isinstance(self.wrapped_env.observation_space, gym.spaces.Discrete) \
+                else np.prod(self.wrapped_env.observation_space.shape)
+
             stripped_path['observations'] = \
-                stripped_path['observations'][:, :self.wrapped_env.observation_space.flat_dim]
+                stripped_path['observations'][:, :obs_dim]
             #  this breaks if the obs of the robot are d>1 dimensional (not a vector)
             stripped_paths.append(stripped_path)
         with logger.tabular_prefix('wrapped_'):

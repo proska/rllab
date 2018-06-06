@@ -11,8 +11,9 @@ from rllab.core import MLP
 from rllab.core import Serializable
 from rllab.policies import StochasticPolicy
 from rllab.misc.overrides import overrides
-from rllab.misc import logger
 from rllab.misc import ext
+from rllab.misc import logger
+from rllab.misc import special
 from rllab.distributions import DiagonalGaussian
 import theano.tensor as TT
 
@@ -54,8 +55,10 @@ class GaussianMLPPolicy(StochasticPolicy, LasagnePowered):
         Serializable.quick_init(self, locals())
         assert isinstance(env_spec.action_space, gym.spaces.Box)
 
-        obs_dim = env_spec.observation_space.flat_dim
-        action_dim = env_spec.action_space.flat_dim
+        obs_dim = env_spec.observation_space.n if \
+                isinstance(env_spec.observation_space, gym.spaces.Discrete) else np.prod(env_spec.observation_space.shape)
+        action_dim = env_spec.action_space.n if \
+                isinstance(env_spec.action_space, gym.spaces.Discrete) else np.prod(env_spec.action_space.shape)
 
         # create network
         if mean_network is None:
@@ -123,14 +126,22 @@ class GaussianMLPPolicy(StochasticPolicy, LasagnePowered):
 
     @overrides
     def get_action(self, observation):
-        flat_obs = self.observation_space.flatten(observation)
+        flat_obs = special.to_onehot(observation, self.observation_space.n) \
+        if isinstance(self.observation_space, gym.spaces.Discrete) else np.asarray(observation).flatten()
+
         mean, log_std = [x[0] for x in self._f_dist([flat_obs])]
         rnd = np.random.normal(size=mean.shape)
         action = rnd * np.exp(log_std) + mean
         return action, dict(mean=mean, log_std=log_std)
 
     def get_actions(self, observations):
-        flat_obs = self.observation_space.flatten_n(observations)
+        flat_obs = None
+        if isinstance(self.observation_space, gym.spaces.Discrete):
+            flat_obs = special.to_onehot_n(observations, self.observation_space.n)
+        else:
+            observations = np.asarray(observations)
+            flat_obs = observations.reshape((observations.shape[0], -1))
+
         means, log_stds = self._f_dist(flat_obs)
         rnd = np.random.normal(size=means.shape)
         actions = rnd * np.exp(log_stds) + means

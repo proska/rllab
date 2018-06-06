@@ -36,11 +36,16 @@ class GaussianGRUPolicy(StochasticPolicy, LasagnePowered):
 
         assert len(hidden_sizes) == 1
 
+        obs_flat = env_spec.observation_space.n if \
+                isinstance(env_spec.observation_space, gym.spaces.Discrete) else np.prod(env_spec.observation_space.shape)
+        action_flat =  env_spec.action_space.n if \
+                isinstance(env_spec.action_space, gym.spaces.Discrete) else np.prod(env_spec.action_space.shape)
+
         if state_include_action:
-            obs_dim = env_spec.observation_space.flat_dim + env_spec.action_space.flat_dim
+            obs_dim = obs_flat + action_flat
         else:
-            obs_dim = env_spec.observation_space.flat_dim
-        action_dim = env_spec.action_space.flat_dim
+            obs_dim = obs_flat
+        action_dim = action_flat
 
         mean_network = GRUNetwork(
             input_shape=(obs_dim,),
@@ -121,15 +126,22 @@ class GaussianGRUPolicy(StochasticPolicy, LasagnePowered):
     def get_action(self, observation):
         if self._state_include_action:
             if self._prev_action is None:
-                prev_action = np.zeros((self.action_space.flat_dim,))
+                prev_action = np.zeros((np.zeros((self.action_space.n if \
+                isinstance(self.action_space, gym.spaces.Discrete) else np.prod(self.action_space.shape))),))
+
             else:
-                prev_action = self.action_space.flatten(self._prev_action)
+                prev_action = special.to_onehot(self.prev_action, self.action_space.n) \
+                if isinstance(self.action_space, gym.spaces.Discrete) else np.asarray(self.prev_action).flatten()
+
+            flat_obs = special.to_onehot(observation, self.observation_space.n) \
+                if isinstance(self.observation_space, gym.spaces.Discrete) else np.asarray(observation).flatten()
             all_input = np.concatenate([
-                self.observation_space.flatten(observation),
+                flat_obs,
                 prev_action
             ])
         else:
-            all_input = self.observation_space.flatten(observation)
+            all_input = special.to_onehot(observation, self.observation_space.n) \
+                if isinstance(self.observation_space, gym.spaces.Discrete) else np.asarray(observation).flatten()
             # should not be used
             prev_action = np.nan
         mean, log_std, hidden_vec = [x[0] for x in self._f_step_mean_std([all_input], [self._prev_hidden])]

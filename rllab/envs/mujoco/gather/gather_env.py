@@ -435,7 +435,10 @@ class GatherEnv(ProxyEnv, Serializable):
             for k, v in path.items():
                 stripped_path[k] = v
             stripped_path['observations'] = \
-                stripped_path['observations'][:, :self.wrapped_env.observation_space.flat_dim]
+                stripped_path['observations'][:, :self.wrapped_env.observation_space.n \
+                if isinstance(self.observation_space, gym.spaces.Discrete) \
+                else np.prod(self.wrapped_env.observation_space.shape)]
+
             #  this breaks if the obs of the robot are d>1 dimensional (not a vector)
             stripped_paths.append(stripped_path)
         with logger.tabular_prefix('wrapped_'):

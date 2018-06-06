@@ -195,8 +195,12 @@ class DDPG(RLAlgorithm):
         # This seems like a rather sequential method
         pool = SimpleReplayPool(
             max_pool_size=self.replay_pool_size,
-            observation_dim=self.env.observation_space.flat_dim,
-            action_dim=self.env.action_space.flat_dim,
+            observation_dim=self.env.observation_space.n if \
+                isinstance(self.env.observation_space, gym.spaces.Discrete) \
+                else np.prod(self.env.observation_space.shape),
+            action_dim=self.env.action_space.n if \
+                isinstance(self.env.action_space, gym.spaces.Discrete) \
+                else np.prod(self.env.action_space.shape),
         )
         self.start_worker()
 

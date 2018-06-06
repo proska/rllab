@@ -25,8 +25,15 @@ class ContinuousMLPQFunction(QFunction, LasagnePowered):
             bn=False):
         Serializable.quick_init(self, locals())
 
-        l_obs = L.InputLayer(shape=(None, env_spec.observation_space.flat_dim), name="obs")
-        l_action = L.InputLayer(shape=(None, env_spec.action_space.flat_dim), name="actions")
+        obs_dim = env_spec.observation_space.n if \
+                isinstance(env_spec.observation_space, gym.spaces.Discrete) \
+                else np.prod(env_spec.observation_space.shape)
+        action_dim = env_spec.action_space.n if \
+                isinstance(env_spec.action_space, gym.spaces.Discrete) \
+                else np.prod(env_spec.action_space.shape)
+
+        l_obs = L.InputLayer(shape=(None, obs_dim), name="obs")
+        l_action = L.InputLayer(shape=(None, action_dim), name="actions")
 
         n_layers = len(hidden_sizes) + 1
 

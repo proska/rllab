@@ -1,6 +1,7 @@
 import gym
-from rllab.spaces import Product
 import numpy as np
+
+from rllab.spaces import Product
 
 
 def test_product_space():
@@ -12,16 +13,19 @@ def test_product_space():
 
 def test_product_space_unflatten_n():
     space = Product([gym.spaces.Discrete(3), gym.spaces.Discrete(3)])
-    np.testing.assert_array_equal(space.flatten((2, 2)), space.flatten_n([(2, 2)])[0])
+    np.testing.assert_array_equal(special.to_onehot((2, 2), space.n), special.to_onehot_n([(2, 2)])[0], space.n)
     np.testing.assert_array_equal(
-        space.unflatten(space.flatten((2, 2))),
-        space.unflatten_n(space.flatten_n([(2, 2)]))[0]
+        special.from_onehot(special.to_onehot((2, 2), space.n)),
+        special.from_onehot_n(special.to_onehot_n([(2, 2)]))[0]
     )
 
 
 def test_box():
     space = gym.spaces.Box(low=-1, high=1, shape=(2, 2))
-    np.testing.assert_array_equal(space.flatten([[1, 2], [3, 4]]), [1, 2, 3, 4])
-    np.testing.assert_array_equal(space.flatten_n([[[1, 2], [3, 4]]]), [[1, 2, 3, 4]])
-    np.testing.assert_array_equal(space.unflatten([1, 2, 3, 4]), [[1, 2], [3, 4]])
-    np.testing.assert_array_equal(space.unflatten_n([[1, 2, 3, 4]]), [[[1, 2], [3, 4]]])
+
+special.to_onehot([[1, 2], [3, 4]]), [1, 2, 3, 4], space.n)
+
+    np.testing.assert_array_equal(special.to_onehot([[1, 2], [3, 4]]), [1, 2, 3, 4], space.n), [1, 2, 3, 4])
+    np.testing.assert_array_equal(special.to_onehot_n([[[1, 2], [3, 4]]], space.n), [[1, 2, 3, 4]])
+    np.testing.assert_array_equal(special.from_onehot([1, 2, 3, 4]), [[1, 2], [3, 4]])
+    np.testing.assert_array_equal(special.from_onehot_n([[1, 2, 3, 4]]), [[[1, 2], [3, 4]]])

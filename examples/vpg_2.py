@@ -1,12 +1,13 @@
-
-from rllab.envs.box2d import CartpoleEnv
-from rllab.baselines import LinearFeatureBaseline
-from rllab.policies import GaussianMLPPolicy
-from rllab.envs import normalize
+from rllab.misc import ext
 import numpy as np
 import theano
 import theano.tensor as TT
 from lasagne.updates import adam
+
+from rllab.baselines import LinearFeatureBaseline
+from rllab.envs import normalize
+from rllab.envs.box2d import CartpoleEnv
+from rllab.policies import GaussianMLPPolicy
 
 # normalize() makes sure that the actions for the environment lies
 # within the range [-1, 1] (only works for environments with continuous actions)
@@ -34,14 +35,14 @@ learning_rate = 0.1
 # doing it in a slightly more abstract way allows us to delegate to the environment for handling the correct data
 # type for the variable. For instance, for an environment with discrete observations, we might want to use integer
 # types if the observations are represented as one-hot vectors.
-observations_var = env.observation_space.new_tensor_variable(
-    'observations',
+observations_var = ext.new_tensor(
+    name='observations',
     # It should have 1 extra dimension since we want to represent a list of observations
-    extra_dims=1
+    ndims=1+1
 )
-actions_var = env.action_space.new_tensor_variable(
-    'actions',
-    extra_dims=1
+actions_var = ext.new_tensor(
+    name='actions',
+    ndims=1+1
 )
 advantages_var = TT.vector('advantages')
 

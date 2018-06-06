@@ -25,7 +25,10 @@ class OUStrategy(ExplorationStrategy, Serializable):
         self.theta = theta
         self.sigma = sigma
         self.action_space = env_spec.action_space
-        self.state = np.ones(self.action_space.flat_dim) * self.mu
+        self.action_dim = self.action_space.n if \
+                isinstance(self.action_space, gym.spaces.Discrete) \
+                else np.prod(self.action_space.shape)
+        self.state = np.ones(self.action_dim) * self.mu
         self.reset()
 
     def __getstate__(self):
@@ -39,7 +42,7 @@ class OUStrategy(ExplorationStrategy, Serializable):
 
     @overrides
     def reset(self):
-        self.state = np.ones(self.action_space.flat_dim) * self.mu
+        self.state = np.ones(self.action_dim) * self.mu
 
     def evolve_state(self):
         x = self.state

@@ -1,7 +1,7 @@
-
-from rllab.envs.box2d import CartpoleEnv
-from rllab.policies import GaussianMLPPolicy
 from rllab.envs import normalize
+from rllab.envs.box2d import CartpoleEnv
+from rllab.misc import ext
+from rllab.policies import GaussianMLPPolicy
 import numpy as np
 import theano
 import theano.tensor as TT
@@ -31,14 +31,16 @@ learning_rate = 0.01
 # doing it in a slightly more abstract way allows us to delegate to the environment for handling the correct data
 # type for the variable. For instance, for an environment with discrete observations, we might want to use integer
 # types if the observations are represented as one-hot vectors.
-observations_var = env.observation_space.new_tensor_variable(
-    'observations',
+
+
+observations_var = ext.new_tensor(
+    name='observations',
     # It should have 1 extra dimension since we want to represent a list of observations
-    extra_dims=1
+    ndim=1+1
 )
-actions_var = env.action_space.new_tensor_variable(
-    'actions',
-    extra_dims=1
+actions_var = ext.new_tensor(
+    name='actions',
+    ndim=1+1
 )
 returns_var = TT.vector('returns')
 

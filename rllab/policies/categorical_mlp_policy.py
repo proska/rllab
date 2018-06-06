@@ -7,6 +7,7 @@ from rllab.core import MLP
 from rllab.core import Serializable
 from rllab.distributions import Categorical
 from rllab.misc import ext
+from rllab.misc import special
 from rllab.misc.overrides import overrides
 from rllab.policies import StochasticPolicy
 
@@ -34,8 +35,11 @@ class CategoricalMLPPolicy(StochasticPolicy, LasagnePowered):
         assert isinstance(env_spec.action_space, gym.spaces.Discrete)
 
         if prob_network is None:
+            flat_obs = env_spec.observation_space.n if \
+            isinstance(env_spec.observation_space, gym.spaces.Discrete) else np.prod(env_spec.observation_space.shape)
+
             prob_network = MLP(
-                input_shape=(env_spec.observation_space.flat_dim * num_seq_inputs,),
+                input_shape=(flat_obs * num_seq_inputs,),
                 output_dim=env_spec.action_space.n,
                 hidden_sizes=hidden_sizes,
                 hidden_nonlinearity=hidden_nonlinearity,
@@ -66,7 +70,9 @@ class CategoricalMLPPolicy(StochasticPolicy, LasagnePowered):
     # the current policy
     @overrides
     def get_action(self, observation, deterministic=False):
-        flat_obs = self.observation_space.flatten(observation)
+        flat_obs = special.to_onehot(observation, self.observation_space.n) \
+                if isinstance(self.observation_space, gym.spaces.Discrete) else np.asarray(observation).flatten()
+
         prob = self._f_prob([flat_obs])[0]
         if deterministic:
             action = np.argmax(prob)
@@ -75,7 +81,14 @@ class CategoricalMLPPolicy(StochasticPolicy, LasagnePowered):
         return action, dict(prob=prob)
 
     def get_actions(self, observations):
-        flat_obs = self.observation_space.flatten_n(observations)
+        flat_obs = None
+        if isinstance(self.observation_space, gym.spaces.Discrete):
+            flat_obs = special.to_onehot_n(observations, self.observation_space.n)
+        else:
+            observations = np.asarray(observations)
+            flat_obs = observations.reshape((observations.shape[0], -1))
+
+
         probs = self._f_prob(flat_obs)
         actions = list(map(self.action_space.weighted_sample, probs))
         return actions, dict(prob=probs)

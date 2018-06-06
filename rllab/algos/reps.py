@@ -53,8 +53,13 @@ class REPS(BatchPolopt, Serializable):
 
         # Init dual param values
         self.param_eta = 15.
+
+        obs_dim = self.env.observation_space.n if \
+                isinstance(self.env.observation_space, gym.spaces.Discrete) \
+                else np.prod(self.env.observation_space.shape)
+
         # Adjust for linear feature vector.
-        self.param_v = np.random.rand(self.env.observation_space.flat_dim * 2 + 4)
+        self.param_v = np.random.rand(obs_dim * 2 + 4)
 
         # Theano vars
         obs_var = self.env.observation_space.new_tensor_variable(

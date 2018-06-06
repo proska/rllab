@@ -10,6 +10,7 @@ from rllab.distributions import Categorical
 from rllab.policies import StochasticPolicy
 from rllab.misc import ext
 from rllab.misc import logger
+from rllab.misc import special
 from rllab.misc import tensor_utils
 from rllab.misc.overrides import overrides
 
@@ -88,13 +89,21 @@ class CategoricalConvPolicy(StochasticPolicy, LasagnePowered):
     # the current policy
     @overrides
     def get_action(self, observation):
-        flat_obs = self.observation_space.flatten(observation)
+        flat_obs = special.to_onehot(observation, self.observation_space.n) \
+        if isinstance(self.observation_space, gym.spaces.Discrete) else np.asarray(observation).flatten()
+
         prob = self._f_prob([flat_obs])[0]
         action = self.action_space.weighted_sample(prob)
         return action, dict(prob=prob)
 
     def get_actions(self, observations):
-        flat_obs = self.observation_space.flatten_n(observations)
+        flat_obs = None
+        if isinstance(self.observation_space, gym.spaces.Discrete):
+            flat_obs = special.to_onehot_n(observations, self.observation_space.n)
+        else:
+            observations = np.asarray(observations)
+            flat_obs = observations.reshape((observations.shape[0], -1))
+
         probs = self._f_prob(flat_obs)
         actions = list(map(self.action_space.weighted_sample, probs))
         return actions, dict(prob=probs)

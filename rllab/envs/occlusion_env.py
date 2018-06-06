@@ -28,7 +28,10 @@ class OcclusionEnv(ProxyEnv, Serializable):
             self._dt = env.sim.opt.timestep * env.frame_skip
 
     def _set_sensor_mask(self, env, sensor_idx):
-        obsdim = env.observation_space.flat_dim
+        obsdim = env.observation_space.n if \
+                isinstance(env.observation_space, gym.spaces.Discrete) \
+                else np.prod(env.observation_space.shape)
+
         if len(sensor_idx) > obsdim:
             raise ValueError(
                 "Length of sensor mask ({0}) cannot be greater than observation dim ({1})".

@@ -23,7 +23,11 @@ class DeterministicMLPPolicy(Policy, LasagnePowered):
             bn=False):
         Serializable.quick_init(self, locals())
 
-        l_obs = L.InputLayer(shape=(None, env_spec.observation_space.flat_dim))
+        obs_dim = env_spec.observation_space.n if \
+                isinstance(env_spec.observation_space, gym.spaces.Discrete) \
+                else np.prod(env_spec.observation_space.shape)
+
+        l_obs = L.InputLayer(shape=(None, obs_dim))
 
         l_hidden = l_obs
         if bn:
@@ -41,9 +45,13 @@ class DeterministicMLPPolicy(Policy, LasagnePowered):
             if bn:
                 l_hidden = batch_norm(l_hidden)
 
+        action_dim = env_spec.action_space.n if \
+                isinstance(env_spec.action_space, gym.spaces.Discrete) \
+                else np.prod(env_spec.action_space.shape)
+
         l_output = L.DenseLayer(
             l_hidden,
-            num_units=env_spec.action_space.flat_dim,
+            num_units=action_dim,
             W=output_W_init,
             b=output_b_init,
             nonlinearity=output_nonlinearity,
