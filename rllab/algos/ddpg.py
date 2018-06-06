@@ -278,7 +278,7 @@ class DDPG(RLAlgorithm):
         # y need to be computed first
         obs = ext.new_tensor(
             name='obs',
-            ndims=1+1,
+            ndim=1+1,
             dtype='uint32'
         )
 
@@ -286,8 +286,8 @@ class DDPG(RLAlgorithm):
         # the training functions below
         action = ext.new_tensor(
             name='action',
-            ndims=1+1,
-            dtype='uint32'
+            ndim=1+1,
+            dtype=
         )
         yvar = TT.vector('ys')
 

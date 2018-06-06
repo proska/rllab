@@ -91,14 +91,14 @@ class MujocoEnv(gym.Env):
         bounds = self.model.actuator_ctrlrange
         lb = bounds[:, 0]
         ub = bounds[:, 1]
-        return gym.spaces.Box(lb, ub)
+        return gym.spaces.Box(lb, ub, dtype=np.float32)
 
     @cached_property
     @overrides
     def observation_space(self):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
-        return gym.spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub, dtype=np.float32)
 
     @property
     def action_bounds(self):

@@ -21,7 +21,7 @@ def test_product_space_unflatten_n():
 
 
 def test_box():
-    space = gym.spaces.Box(low=-1, high=1, shape=(2, 2))
+    space = gym.spaces.Box(low=-1, high=1, shape=(2, 2), dtype=np.float32)
 
 special.to_onehot([[1, 2], [3, 4]]), [1, 2, 3, 4], space.n)
 

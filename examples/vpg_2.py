@@ -38,12 +38,12 @@ learning_rate = 0.1
 observations_var = ext.new_tensor(
     name='observations',
     # It should have 1 extra dimension since we want to represent a list of observations
-    ndims=1+1,
+    ndim=1+1,
     dtype=theano.config.floatX
 )
 actions_var = ext.new_tensor(
     name='actions',
-    ndims=1+1,
+    ndim=1+1,
     dtype=theano.config.floatX
 )
 advantages_var = TT.vector('advantages')

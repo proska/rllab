@@ -351,20 +351,20 @@ class GatherEnv(ProxyEnv, Serializable):
     def observation_space(self):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
-        return gym.spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub, dtype=np.float32)
 
     # space of only the robot observations (they go first in the get current obs)
     @property
     def robot_observation_space(self):
         shp = self.get_current_robot_obs().shape
         ub = BIG * np.ones(shp)
-        return gym.spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub, dtype=np.float32)
 
     @property
     def maze_observation_space(self):
         shp = np.concatenate(self.get_readings()).shape
         ub = BIG * np.ones(shp)
-        return gym.spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub, dtype=np.float32)
 
     @property
     @overrides

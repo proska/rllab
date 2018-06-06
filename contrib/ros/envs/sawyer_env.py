@@ -166,7 +166,7 @@ class SawyerEnv(RosEnv, Serializable):
         Returns a Space object
         """
         return gym.spaces.Box(
-            -np.inf, np.inf, shape=self.get_observation()['observation'].shape)
+            -np.inf, np.inf, shape=self.get_observation()['observation'].shape, dtype=np.float32)
 
     # ================================================
     # Functions that gazebo env asks to implement

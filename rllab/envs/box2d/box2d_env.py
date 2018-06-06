@@ -111,7 +111,7 @@ class Box2DEnv(gym.Env):
             [control.ctrllimit[0] for control in self.extra_data.controls])
         ub = np.array(
             [control.ctrllimit[1] for control in self.extra_data.controls])
-        return gym.spaces.Box(low=lb, high=ub)
+        return gym.spaces.Box(low=lb, high=ub, dtype=np.float32)
 
     @property
     @overrides
@@ -121,7 +121,7 @@ class Box2DEnv(gym.Env):
         else:
             d = len(self.extra_data.states)
         ub = BIG * np.ones(d)
-        return gym.spaces.Box(low=ub * -1, high=ub)
+        return gym.spaces.Box(low=ub * -1, high=ub, dtype=np.float32)
 
     @property
     def action_bounds(self):

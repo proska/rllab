@@ -8,11 +8,11 @@ from rllab.envs.env_spec import EnvSpec
 class PointEnv(gym.Env):
     @property
     def observation_space(self):
-        return gym.spaces.Box(low=-np.inf, high=np.inf, shape=(2, ))
+        return gym.spaces.Box(low=-np.inf, high=np.inf, shape=(2, ), dtype=np.float32)
 
     @property
     def action_space(self):
-        return gym.spaces.Box(low=-0.1, high=0.1, shape=(2, ))
+        return gym.spaces.Box(low=-0.1, high=0.1, shape=(2, ), dtype=np.float32)
 
     def reset(self):
         self._state = np.random.uniform(-1, 1, size=(2, ))

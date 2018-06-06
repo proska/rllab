@@ -83,14 +83,14 @@ class NormalizedEnv(ProxyEnv, Serializable):
     def action_space(self):
         if isinstance(self._wrapped_env.action_space, gym.spaces.Box):
             ub = np.ones(self._wrapped_env.action_space.shape)
-            return gym.spaces.Box(-1 * ub, ub)
+            return gym.spaces.Box(-1 * ub, ub, dtype=np.float32)
         return self._wrapped_env.action_space
 
     @overrides
     def step(self, action):
         if isinstance(self._wrapped_env.action_space, gym.spaces.Box):
             # rescale the action
-            lb, ub = self._wrapped_env.action_space.bounds
+            lb, ub = self._wrapped_env.action_space.low, self._wrapped_env.action_space.high
             scaled_action = lb + (action + 1.) * 0.5 * (ub - lb)
             scaled_action = np.clip(scaled_action, lb, ub)
         else:

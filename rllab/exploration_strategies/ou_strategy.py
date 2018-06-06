@@ -58,7 +58,7 @@ class OUStrategy(ExplorationStrategy, Serializable):
 
 
 if __name__ == "__main__":
-    ou = OUStrategy(env_spec=AttrDict(action_space=gym.spaces.Box(low=-1, high=1, shape=(1,))), mu=0, theta=0.15, sigma=0.3)
+    ou = OUStrategy(env_spec=AttrDict(action_space=gym.spaces.Box(low=-1, high=1, shape=(1,))), mu=0, theta=0.15, sigma=0.3, dtype=np.float32)
     states = []
     for i in range(1000):
         states.append(ou.evolve_state()[0])

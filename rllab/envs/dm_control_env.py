@@ -71,12 +71,12 @@ class DmControlEnv(gym.Env, Serializable):
                                               np.inf in action_spec.maximum):
             return gym.spaces.Discrete(np.prod(action_spec.shape))
         else:
-            return gym.spaces.Box(action_spec.minimum, action_spec.maximum)
+            return gym.spaces.Box(action_spec.minimum, action_spec.maximum, dtype=np.float32)
 
     @property
     def observation_space(self):
         flat_dim = self._flat_shape(self._env.observation_spec())
-        return gym.spaces.Box(low=-np.inf, high=np.inf, shape=[flat_dim])
+        return gym.spaces.Box(low=-np.inf, high=np.inf, shape=[flat_dim], dtype=np.float32)
 
     @property
     def total_reward(self):

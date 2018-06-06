@@ -34,12 +34,12 @@ class NPO(BatchPolopt):
         is_recurrent = int(self.policy.recurrent)
         obs_var = ext.new_tensor(
             name='obs',
-            ndims=1+1 + is_recurrent,
+            ndim=1+1 + is_recurrent,
             dtype=theano.config.floatX
         )
         action_var = ext.new_tensor(
             name='action',
-            ndims=1+1 + is_recurrent,
+            ndim=1+1 + is_recurrent,
             dtype=theano.config.floatX
         )
         advantage_var = ext.new_tensor(

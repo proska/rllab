@@ -13,4 +13,4 @@ class AntHillEnv(HillEnv):
     @overrides
     def _mod_hfield(self, hfield):
         # clear a flat patch for the robot to start off from
-        return terrain.clear_patch(hfield, gym.spaces.Box(np.array([-2.0, -2.0]), np.array([0.0, 0.0])))
+        return terrain.clear_patch(hfield, gym.spaces.Box(np.array([-2.0, -2.0]), np.array([0.0, 0.0])), dtype=np.float32)

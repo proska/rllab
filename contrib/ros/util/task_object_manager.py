@@ -129,4 +129,4 @@ class TaskObjectManager(object):
         return gym.spaces.Box(
             -np.inf,
             np.inf,
-            shape=self.get_manipulatables_observation()['obs'].shape)
+            shape=self.get_manipulatables_observation()['obs'].shape, dtype=np.float32)

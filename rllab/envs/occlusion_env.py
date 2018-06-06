@@ -58,7 +58,7 @@ class OcclusionEnv(ProxyEnv, Serializable):
     def observation_space(self):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
-        return gym.spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub, dtype=np.float32)
 
     @overrides
     def reset(self):
