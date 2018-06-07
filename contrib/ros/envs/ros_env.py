@@ -4,8 +4,6 @@ from rllab.core.serializable import Serializable
 from rllab.envs.base import Env
 from rllab.misc.ext import get_seed
 
-from contrib.ros.util.gazebo import Gazebo
-
 
 class RosEnv(Env, Serializable):
     """
@@ -20,12 +18,6 @@ class RosEnv(Env, Serializable):
         Serializable.quick_init(self, locals())
 
         np.random.RandomState(get_seed())
-
-        if simulated:
-            self.gazebo = Gazebo()
-        else:
-            # TODO(gh/8: Sawyer runtime support)
-            pass
 
         self._initial_setup()
 

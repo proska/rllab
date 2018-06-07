@@ -15,6 +15,7 @@ from contrib.ros.worlds.block_world import BlockWorld
 class PushEnv(SawyerEnv, Serializable):
     def __init__(self,
                  initial_goal,
+                 initial_joint_pos,
                  sparse_reward=False,
                  simulated=False,
                  distance_threshold=0.05,
@@ -28,7 +29,9 @@ class PushEnv(SawyerEnv, Serializable):
         self.initial_goal = initial_goal
         self.goal = self.initial_goal.copy()
 
-        self._sawyer = Sawyer(control_mode=robot_control_mode)
+        self._sawyer = Sawyer(
+            initial_joint_pos=initial_joint_pos,
+            control_mode=robot_control_mode)
         self._block_world = BlockWorld(simulated)
 
         SawyerEnv.__init__(self, simulated=simulated)
