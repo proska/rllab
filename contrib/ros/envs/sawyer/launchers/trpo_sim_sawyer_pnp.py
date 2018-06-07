@@ -1,5 +1,3 @@
-import os.path as osp
-
 import numpy as np
 import rospy
 
@@ -11,39 +9,15 @@ from sandbox.rocky.tf.algos.trpo import TRPO
 from sandbox.rocky.tf.policies.gaussian_mlp_policy import GaussianMLPPolicy
 from sandbox.rocky.tf.envs.base import TfEnv
 
-from contrib.ros.envs.sawyer.launchers import model_dir
 from contrib.ros.envs.sawyer.pick_and_place_env import PickAndPlaceEnv
-from contrib.ros.envs.sawyer.task_object_manager import TaskObject, TaskObjectManager
 
 
 def run_task(*_):
-    block = TaskObject(
-        name='block',
-        initial_pos=(0.5725, 0.1265, 0.90),
-        random_delta_range=0.15,
-        resource=osp.join(model_dir, 'block/model.urdf'))
-    table = TaskObject(
-        name='table',
-        initial_pos=(0.75, 0.0, 0.0),
-        random_delta_range=0.15,
-        resource=osp.join(model_dir, 'cafe_table/model.sdf'))
-
     initial_goal = np.array([0.6, -0.1, 0.80])
-
-    target = TaskObject(
-        name='target',
-        initial_pos=(initial_goal[0], initial_goal[1], initial_goal[2]),
-        random_delta_range=0.15,
-        resource=osp.join(model_dir, 'target/model.sdf'))
-
-    task_obj_mgr = TaskObjectManager()
-    task_obj_mgr.add_target(target)
-    task_obj_mgr.add_common(table)
-    task_obj_mgr.add_manipulatable(block)
 
     rospy.init_node('trpo_sim_sawyer_pnp_exp', anonymous=True)
 
-    pnp_env = PickAndPlaceEnv(initial_goal, task_obj_mgr, simulated=True)
+    pnp_env = PickAndPlaceEnv(initial_goal, simulated=True)
 
     rospy.on_shutdown(pnp_env.shutdown)
 

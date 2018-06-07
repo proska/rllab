@@ -33,10 +33,7 @@ INITIAL_REAL_ROBOT_JOINT_POS = {
 
 
 class Sawyer(Robot):
-    def __init__(self,
-                 initial_joint_pos=None,
-                 simulated=False,
-                 control_mode='position'):
+    def __init__(self, initial_joint_pos, control_mode='position'):
         """
         :param initial_joint_pos: {str: float}
                             {'joint_name': position_value}, and also initial_joint_pos should include all of the
@@ -45,12 +42,7 @@ class Sawyer(Robot):
         Robot.__init__(self)
         self._limb = intera_interface.Limb('right')
         self._gripper = intera_interface.Gripper()
-        if initial_joint_pos is not None:
-            self._initial_joint_pos = initial_joint_pos
-        elif simulated:
-            self._initial_joint_pos = INITIAL_SIM_ROBOT_JOINT_POS
-        else:
-            self._initial_joint_pos = INITIAL_REAL_ROBOT_JOINT_POS
+        self._initial_joint_pos = initial_joint_pos
         self._control_mode = control_mode
         self._joint_limits = rospy.wait_for_message('/robot/joint_limits',
                                                     JointLimits)
