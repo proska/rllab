@@ -27,8 +27,7 @@ class SawyerEnv(RosEnv):
         self._robot.reset()
         self._world.reset()
         self.goal = self.sample_goal()
-        obs = self.get_observation()
-        initial_observation = obs['observation']
+        initial_observation = self.get_observation().observation
         return initial_observation
 
     @rate_limited(100)
@@ -51,7 +50,11 @@ class SawyerEnv(RosEnv):
 
         obs = self.get_observation()
 
-        reward = self.reward(obs['achieved_goal'], self.goal)
-        done = self.done(obs['achieved_goal'], self.goal)
-        next_observation = obs['observation']
+        reward = self.reward(obs.achieved_goal, self.goal)
+        done = self.done(obs.achieved_goal, self.goal)
+        next_observation = obs.observation
         return Step(observation=next_observation, reward=reward, done=done)
+
+    @property
+    def action_space(self):
+        return self._robot.action_space

@@ -1,6 +1,7 @@
 """
 Pick-and-place task for the sawyer robot
 """
+import collections
 
 import numpy as np
 
@@ -41,16 +42,12 @@ class PickAndPlaceEnv(SawyerEnv, Serializable):
             world=self._block_world)
 
     @property
-    def action_space(self):
-        return self._sawyer.action_space
-
-    @property
     def observation_space(self):
         """
         Returns a Space object
         """
         return Box(
-            -np.inf, np.inf, shape=self.get_observation()['observation'].shape)
+            -np.inf, np.inf, shape=self.get_observation().observation.shape)
 
     def sample_goal(self):
         """
@@ -77,13 +74,17 @@ class PickAndPlaceEnv(SawyerEnv, Serializable):
 
         world_obs = self._block_world.get_observation()
 
-        obs = np.concatenate((robot_obs, world_obs['obs']))
+        obs = np.concatenate((robot_obs, world_obs.obs))
 
-        return {
-            'observation': obs,
-            'achieved_goal': world_obs['achieved_goal'],
-            'desired_goal': self.goal
-        }
+        Observation = collections.namedtuple(
+            'Observation', 'observation achieved_goal desired_goal')
+
+        observation = Observation(
+            observation=obs,
+            achieved_goal=world_obs.achieved_goal,
+            desired_goal=self.goal)
+
+        return observation
 
     def reward(self, achieved_goal, goal):
         """

@@ -1,4 +1,9 @@
+import os.path as osp
+
+
 class World(object):
+    MODEL_DIR = osp.join(osp.dirname(__file__), 'models')
+
     def initialize(self):
         raise NotImplementedError
 

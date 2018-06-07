@@ -1,3 +1,4 @@
+import collections
 import os.path as osp
 
 from gazebo_msgs.msg import ModelStates
@@ -7,8 +8,7 @@ import rospy
 
 from rllab.spaces import Box
 
-from contrib.ros.util.gazebo import Gazebo
-from contrib.ros.worlds import model_dir
+from contrib.ros.worlds.gazebo import Gazebo
 from contrib.ros.worlds.world import World
 
 
@@ -82,16 +82,16 @@ class BlockWorld(World):
             Gazebo.load_gazebo_model(
                 'table',
                 Pose(position=Point(x=0.75, y=0.0, z=0.0)),
-                osp.join(model_dir, 'cafe_table/model.sdf'))
+                osp.join(World.MODEL_DIR, 'cafe_table/model.sdf'))
             Gazebo.load_gazebo_model(
                 'block',
                 Pose(position=Point(x=0.5725, y=0.1265, z=0.90)),
-                osp.join(model_dir, 'block/model.urdf'))
+                osp.join(World.MODEL_DIR, 'block/model.urdf'))
             block = Block(
                 name='block',
                 initial_pos=(0.5725, 0.1265, 0.90),
                 random_delta_range=0.15,
-                resource=osp.join(model_dir, 'block/model.urdf'))
+                resource=osp.join(World.MODEL_DIR, 'block/model.urdf'))
             self._blocks.append(block)
         else:
             # TODO(gh/8: Sawyer runtime support)
@@ -164,11 +164,16 @@ class BlockWorld(World):
 
         obs = np.concatenate((blocks_pos, blocks_ori))
 
-        return {'obs': obs, 'achieved_goal': achieved_goal}
+        Observation = collections.namedtuple('Observation',
+                                             'obs achieved_goal')
+
+        observation = Observation(obs=obs, achieved_goal=achieved_goal)
+
+        return observation
 
     @property
     def observation_space(self):
-        return Box(-np.inf, np.inf, shape=self.get_observation()['obs'].shape)
+        return Box(-np.inf, np.inf, shape=self.get_observation().obs.shape)
 
     def add_block(self, block):
         if self._simulated:
