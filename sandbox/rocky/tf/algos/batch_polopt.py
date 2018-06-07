@@ -1,11 +1,14 @@
 import time
+
+import tensorflow as tf
+
 from rllab.algos import RLAlgorithm
 import rllab.misc.logger as logger
+
+from sandbox.rocky.tf.plotter import plotter
 from sandbox.rocky.tf.policies.base import Policy
-import tensorflow as tf
 from sandbox.rocky.tf.samplers import BatchSampler
 from sandbox.rocky.tf.samplers import VectorizedSampler
-from rllab.sampler.utils import rollout
 
 
 class BatchPolopt(RLAlgorithm):
@@ -14,30 +17,28 @@ class BatchPolopt(RLAlgorithm):
     This includes various policy gradient methods like vpg, npg, ppo, trpo, etc.
     """
 
-    def __init__(
-            self,
-            env,
-            policy,
-            baseline,
-            scope=None,
-            n_itr=500,
-            start_itr=0,
-            batch_size=5000,
-            max_path_length=500,
-            discount=0.99,
-            gae_lambda=1,
-            plot=False,
-            pause_for_plot=False,
-            center_adv=True,
-            positive_adv=False,
-            store_paths=False,
-            whole_paths=True,
-            fixed_horizon=False,
-            sampler_cls=None,
-            sampler_args=None,
-            force_batch_sampler=False,
-            **kwargs
-    ):
+    def __init__(self,
+                 env,
+                 policy,
+                 baseline,
+                 scope=None,
+                 n_itr=500,
+                 start_itr=0,
+                 batch_size=5000,
+                 max_path_length=500,
+                 discount=0.99,
+                 gae_lambda=1,
+                 plot=False,
+                 pause_for_plot=False,
+                 center_adv=True,
+                 positive_adv=False,
+                 store_paths=False,
+                 whole_paths=True,
+                 fixed_horizon=False,
+                 sampler_cls=None,
+                 sampler_args=None,
+                 force_batch_sampler=False,
+                 **kwargs):
         """
         :param env: Environment
         :param policy: Policy
@@ -86,8 +87,10 @@ class BatchPolopt(RLAlgorithm):
         self.sampler = sampler_cls(self, **sampler_args)
         self.init_opt()
 
-    def start_worker(self):
+    def start_worker(self, sess):
         self.sampler.start_worker()
+        if self.plot:
+            plotter.init_plot(self.env, self.policy, sess)
 
     def shutdown_worker(self):
         self.sampler.shutdown_worker()
@@ -103,9 +106,9 @@ class BatchPolopt(RLAlgorithm):
         if sess is None:
             sess = tf.Session()
             sess.__enter__()
-            
+
         sess.run(tf.global_variables_initializer())
-        self.start_worker()
+        self.start_worker(sess)
         start_time = time.time()
         for itr in range(self.start_itr, self.n_itr):
             itr_start_time = time.time()
@@ -119,7 +122,8 @@ class BatchPolopt(RLAlgorithm):
                 logger.log("Optimizing policy...")
                 self.optimize_policy(itr, samples_data)
                 logger.log("Saving snapshot...")
-                params = self.get_itr_snapshot(itr, samples_data)  # , **kwargs)
+                params = self.get_itr_snapshot(itr,
+                                               samples_data)  # , **kwargs)
                 if self.store_paths:
                     params["paths"] = samples_data["paths"]
                 logger.save_itr_params(itr, params)
@@ -128,10 +132,11 @@ class BatchPolopt(RLAlgorithm):
                 logger.record_tabular('ItrTime', time.time() - itr_start_time)
                 logger.dump_tabular(with_prefix=False)
                 if self.plot:
-                    rollout(self.env, self.policy, animated=True, max_path_length=self.max_path_length)
+                    self.update_plot()
                     if self.pause_for_plot:
                         input("Plotting evaluation run: Press Enter to "
                               "continue...")
+
         self.shutdown_worker()
         if created_session:
             sess.close()
@@ -158,3 +163,6 @@ class BatchPolopt(RLAlgorithm):
     def optimize_policy(self, itr, samples_data):
         raise NotImplementedError
 
+    def update_plot(self):
+        if self.plot:
+            plotter.update_plot(self.policy, self.max_path_length)
