@@ -5,7 +5,7 @@ import tensorflow as tf
 from rllab.algos import RLAlgorithm
 import rllab.misc.logger as logger
 
-from sandbox.rocky.tf.plotter import plotter
+from sandbox.rocky.tf.plotter import Plotter
 from sandbox.rocky.tf.policies.base import Policy
 from sandbox.rocky.tf.samplers import BatchSampler
 from sandbox.rocky.tf.samplers import VectorizedSampler
@@ -90,10 +90,12 @@ class BatchPolopt(RLAlgorithm):
     def start_worker(self, sess):
         self.sampler.start_worker()
         if self.plot:
-            plotter.init_plot(self.env, self.policy, sess)
+            self.plotter = Plotter(self.env, self.policy)
 
     def shutdown_worker(self):
         self.sampler.shutdown_worker()
+        if self.plot:
+            self.plotter.shutdown()
 
     def obtain_samples(self, itr):
         return self.sampler.obtain_samples(itr)
@@ -165,4 +167,4 @@ class BatchPolopt(RLAlgorithm):
 
     def update_plot(self):
         if self.plot:
-            plotter.update_plot(self.policy, self.max_path_length)
+            self.plotter.update_plot(self.policy, self.max_path_length)
