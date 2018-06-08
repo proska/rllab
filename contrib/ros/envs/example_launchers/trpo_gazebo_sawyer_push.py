@@ -7,9 +7,9 @@ from rllab.baselines.linear_feature_baseline import LinearFeatureBaseline
 from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 
-from sandbox.rocky.tf.algos.trpo import TRPO
-from sandbox.rocky.tf.policies.gaussian_mlp_policy import GaussianMLPPolicy
-from sandbox.rocky.tf.envs.base import TfEnv
+from rllab.tf.algos.trpo import TRPO
+from rllab.tf.policies.gaussian_mlp_policy import GaussianMLPPolicy
+from rllab.tf.envs.base import TfEnv
 
 from contrib.ros.envs.example_launchers import model_dir
 from contrib.ros.envs.sawyer.push_env import PushEnv
