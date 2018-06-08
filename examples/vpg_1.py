@@ -1,17 +1,18 @@
-
-from rllab.envs.box2d import CartpoleEnv
-from rllab.policies import GaussianMLPPolicy
-from rllab.envs import normalize
+from lasagne.updates import adam
 import numpy as np
 import theano
 import theano.tensor as TT
-from lasagne.updates import adam
+
+from rllab.envs import normalize
+from rllab.envs.box2d import CartpoleEnv
+from rllab.envs.gym_space_util import new_tensor_variable
+from rllab.policies import GaussianMLPPolicy
 
 # normalize() makes sure that the actions for the environment lies
 # within the range [-1, 1] (only works for environments with continuous actions)
 env = normalize(CartpoleEnv())
 # Initialize a neural network policy with a single hidden layer of 8 hidden units
-policy = GaussianMLPPolicy(env.spec, hidden_sizes=(8,))
+policy = GaussianMLPPolicy(env.spec, hidden_sizes=(8, ))
 
 # We will collect 100 trajectories per iteration
 N = 100
@@ -31,15 +32,12 @@ learning_rate = 0.01
 # doing it in a slightly more abstract way allows us to delegate to the environment for handling the correct data
 # type for the variable. For instance, for an environment with discrete observations, we might want to use integer
 # types if the observations are represented as one-hot vectors.
-observations_var = env.observation_space.new_tensor_variable(
+observations_var = new_tensor_variable(
+    env.observation_space,
     'observations',
     # It should have 1 extra dimension since we want to represent a list of observations
-    extra_dims=1
-)
-actions_var = env.action_space.new_tensor_variable(
-    'actions',
-    extra_dims=1
-)
+    extra_dims=1)
+actions_var = new_tensor_variable(env.action_space, 'actions', extra_dims=1)
 returns_var = TT.vector('returns')
 
 # policy.dist_info_sym returns a dictionary, whose values are symbolic expressions for quantities related to the
@@ -53,7 +51,8 @@ dist_info_vars = policy.dist_info_sym(observations_var)
 dist = policy.distribution
 
 # Note that we negate the objective, since most optimizers assume a minimization problem
-surr = - TT.mean(dist.log_likelihood_sym(actions_var, dist_info_vars) * returns_var)
+surr = -TT.mean(
+    dist.log_likelihood_sym(actions_var, dist_info_vars) * returns_var)
 
 # Get the list of trainable parameters.
 params = policy.get_params(trainable=True)
@@ -63,8 +62,7 @@ f_train = theano.function(
     inputs=[observations_var, actions_var, returns_var],
     outputs=None,
     updates=adam(grads, params, learning_rate=learning_rate),
-    allow_input_downcast=True
-)
+    allow_input_downcast=True)
 
 for _ in range(n_itr):
 
@@ -105,12 +103,12 @@ for _ in range(n_itr):
         # The returns are stored backwards in time, so we need to revert it
         returns = returns[::-1]
 
-        paths.append(dict(
-            observations=np.array(observations),
-            actions=np.array(actions),
-            rewards=np.array(rewards),
-            returns=np.array(returns)
-        ))
+        paths.append(
+            dict(
+                observations=np.array(observations),
+                actions=np.array(actions),
+                rewards=np.array(rewards),
+                returns=np.array(returns)))
 
     observations = np.concatenate([p["observations"] for p in paths])
     actions = np.concatenate([p["actions"] for p in paths])

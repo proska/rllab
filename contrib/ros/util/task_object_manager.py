@@ -1,9 +1,8 @@
 from gazebo_msgs.msg import ModelStates
 from geometry_msgs.msg import Point
+import gym
 import numpy as np
 import rospy
-
-from rllab.spaces import Box
 
 
 class TaskObject(object):
@@ -127,7 +126,8 @@ class TaskObjectManager(object):
 
     @property
     def manipulatables_observation_space(self):
-        return Box(
+        return gym.spaces.Box(
             -np.inf,
             np.inf,
-            shape=self.get_manipulatables_observation()['obs'].shape)
+            shape=self.get_manipulatables_observation()['obs'].shape,
+            dtype=np.float32)

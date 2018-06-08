@@ -1,17 +1,19 @@
+import sys
+
 from rllab.baselines import LinearFeatureBaseline
+from rllab.envs import GymEnv
 from rllab.envs import normalize
+from rllab.envs.gym_env_util import spec
+from rllab.misc import run_experiment_lite
+
+from sandbox.rocky.tf.algos import TRPO
 from sandbox.rocky.tf.envs import TfEnv
 from sandbox.rocky.tf.policies import GaussianMLPPolicy
-from sandbox.rocky.tf.algos import TRPO
-from rllab.misc import run_experiment_lite
-from rllab.envs import GymEnv
-import sys
 
 from rllab.misc import VariantGenerator, variant
 
 
 class VG(VariantGenerator):
-
     @variant
     def step_size(self):
         return [0.01, 0.05, 0.1]
@@ -23,16 +25,17 @@ class VG(VariantGenerator):
 
 def run_task(vv):
 
-    env = TfEnv(normalize(GymEnv('HalfCheetah-v1', record_video=False, record_log=False)))
+    env = TfEnv(
+        normalize(
+            GymEnv('HalfCheetah-v1', record_video=False, record_log=False)))
 
     policy = GaussianMLPPolicy(
-        env_spec=env.spec,
+        env_spec=spec(env),
         # The neural network policy should have two hidden layers, each with 32 hidden units.
         hidden_sizes=(32, 32),
-        name="policy"
-    )
+        name="policy")
 
-    baseline = LinearFeatureBaseline(env_spec=env.spec)
+    baseline = LinearFeatureBaseline(env_spec=spec(env))
 
     algo = TRPO(
         env=env,

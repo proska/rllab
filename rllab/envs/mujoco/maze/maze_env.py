@@ -1,19 +1,19 @@
+import gym
+import math
+import numpy as np
 import os.path as osp
 import tempfile
 import xml.etree.ElementTree as ET
-import math
-import numpy as np
 
-from rllab import spaces
+from rllab.core import Serializable
 from rllab.envs import Step
+from rllab.envs.gym_space_util import flat_dim
 from rllab.envs.proxy_env import ProxyEnv
 from rllab.envs.mujoco.maze.maze_env_utils import construct_maze
 from rllab.envs.mujoco.mujoco_env import MODEL_DIR, BIG
 from rllab.envs.mujoco.maze.maze_env_utils import ray_segment_intersect, point_distance
-from rllab.core import Serializable
-from rllab.misc.overrides import overrides
-
 from rllab.misc import logger
+from rllab.misc.overrides import overrides
 
 
 class MazeEnv(ProxyEnv, Serializable):
@@ -187,14 +187,14 @@ class MazeEnv(ProxyEnv, Serializable):
                     # Wall -> add to wall readings
                     if first_seg["distance"] <= self._sensor_range:
                         wall_readings[ray_idx] = (
-                            self._sensor_range -
-                            first_seg["distance"]) / self._sensor_range
+                            self._sensor_range - first_seg["distance"]
+                        ) / self._sensor_range
                 elif first_seg["type"] == 'g':
                     # Goal -> add to goal readings
                     if first_seg["distance"] <= self._sensor_range:
                         goal_readings[ray_idx] = (
-                            self._sensor_range -
-                            first_seg["distance"]) / self._sensor_range
+                            self._sensor_range - first_seg["distance"]
+                        ) / self._sensor_range
                 else:
                     assert False
 
@@ -236,20 +236,20 @@ class MazeEnv(ProxyEnv, Serializable):
     def observation_space(self):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub, dtype=np.float32)
 
     # space of only the robot observations (they go first in the get current obs) THIS COULD GO IN PROXYENV
     @property
     def robot_observation_space(self):
         shp = self.get_current_robot_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub, dtype=np.float32)
 
     @property
     def maze_observation_space(self):
         shp = self.get_current_maze_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub, dtype=np.float32)
 
     def _find_robot(self):
         structure = self.MAZE_STRUCTURE
@@ -333,7 +333,7 @@ class MazeEnv(ProxyEnv, Serializable):
             for k, v in path.items():
                 stripped_path[k] = v
             stripped_path['observations'] = \
-                stripped_path['observations'][:, :self.wrapped_env.observation_space.flat_dim]
+                stripped_path['observations'][:, :flat_dim(self.wrapped_env.observation_space)]
             #  this breaks if the obs of the robot are d>1 dimensional (not a vector)
             stripped_paths.append(stripped_path)
         with logger.tabular_prefix('wrapped_'):

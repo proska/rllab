@@ -1,20 +1,20 @@
+import gym
 import lasagne
 import lasagne.layers as L
 import lasagne.nonlinearities as NL
 import numpy as np
+import theano.tensor as TT
 
 from rllab.core import ParamLayer
 from rllab.core import LasagnePowered
 from rllab.core import MLP
-from rllab.spaces import Box
-
 from rllab.core import Serializable
-from rllab.policies import StochasticPolicy
+from rllab.distributions import DiagonalGaussian
+from rllab.envs.gym_space_util import flat_dim, flatten, flatten_n
 from rllab.misc.overrides import overrides
 from rllab.misc import logger
 from rllab.misc import ext
-from rllab.distributions import DiagonalGaussian
-import theano.tensor as TT
+from rllab.policies import StochasticPolicy
 
 
 class GaussianMLPPolicy(StochasticPolicy, LasagnePowered):
@@ -52,15 +52,15 @@ class GaussianMLPPolicy(StochasticPolicy, LasagnePowered):
         :return:
         """
         Serializable.quick_init(self, locals())
-        assert isinstance(env_spec.action_space, Box)
+        assert isinstance(env_spec.action_space, gym.spaces.Box)
 
-        obs_dim = env_spec.observation_space.flat_dim
-        action_dim = env_spec.action_space.flat_dim
+        obs_dim = flat_dim(env_spec.observation_space)
+        action_dim = flat_dim(env_spec.action_space)
 
         # create network
         if mean_network is None:
             mean_network = MLP(
-                input_shape=(obs_dim,),
+                input_shape=(obs_dim, ),
                 output_dim=action_dim,
                 hidden_sizes=hidden_sizes,
                 hidden_nonlinearity=hidden_nonlinearity,
@@ -76,7 +76,7 @@ class GaussianMLPPolicy(StochasticPolicy, LasagnePowered):
         else:
             if adaptive_std:
                 std_network = MLP(
-                    input_shape=(obs_dim,),
+                    input_shape=(obs_dim, ),
                     input_layer=mean_network.input_layer,
                     output_dim=action_dim,
                     hidden_sizes=std_hidden_sizes,
@@ -116,21 +116,22 @@ class GaussianMLPPolicy(StochasticPolicy, LasagnePowered):
         )
 
     def dist_info_sym(self, obs_var, state_info_vars=None):
-        mean_var, log_std_var = L.get_output([self._l_mean, self._l_log_std], obs_var)
+        mean_var, log_std_var = L.get_output([self._l_mean, self._l_log_std],
+                                             obs_var)
         if self.min_std is not None:
             log_std_var = TT.maximum(log_std_var, np.log(self.min_std))
         return dict(mean=mean_var, log_std=log_std_var)
 
     @overrides
     def get_action(self, observation):
-        flat_obs = self.observation_space.flatten(observation)
+        flat_obs = flatten(self.observation_space, observation)
         mean, log_std = [x[0] for x in self._f_dist([flat_obs])]
         rnd = np.random.normal(size=mean.shape)
         action = rnd * np.exp(log_std) + mean
         return action, dict(mean=mean, log_std=log_std)
 
     def get_actions(self, observations):
-        flat_obs = self.observation_space.flatten_n(observations)
+        flat_obs = flatten_n(self.observation_space, observations)
         means, log_stds = self._f_dist(flat_obs)
         rnd = np.random.normal(size=means.shape)
         actions = rnd * np.exp(log_stds) + means
@@ -146,14 +147,18 @@ class GaussianMLPPolicy(StochasticPolicy, LasagnePowered):
         :return:
         """
         new_dist_info_vars = self.dist_info_sym(obs_var, action_var)
-        new_mean_var, new_log_std_var = new_dist_info_vars["mean"], new_dist_info_vars["log_std"]
-        old_mean_var, old_log_std_var = old_dist_info_vars["mean"], old_dist_info_vars["log_std"]
-        epsilon_var = (action_var - old_mean_var) / (TT.exp(old_log_std_var) + 1e-8)
+        new_mean_var, new_log_std_var = new_dist_info_vars[
+            "mean"], new_dist_info_vars["log_std"]
+        old_mean_var, old_log_std_var = old_dist_info_vars[
+            "mean"], old_dist_info_vars["log_std"]
+        epsilon_var = (action_var - old_mean_var) / (
+            TT.exp(old_log_std_var) + 1e-8)
         new_action_var = new_mean_var + epsilon_var * TT.exp(new_log_std_var)
         return new_action_var
 
     def log_diagnostics(self, paths):
-        log_stds = np.vstack([path["agent_infos"]["log_std"] for path in paths])
+        log_stds = np.vstack(
+            [path["agent_infos"]["log_std"] for path in paths])
         logger.record_tabular('AveragePolicyStd', np.mean(np.exp(log_stds)))
 
     @property

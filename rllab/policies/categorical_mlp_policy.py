@@ -1,3 +1,4 @@
+import gym
 import lasagne.layers as L
 import lasagne.nonlinearities as NL
 
@@ -5,12 +6,14 @@ from rllab.core import LasagnePowered
 from rllab.core import MLP
 from rllab.core import Serializable
 from rllab.distributions import Categorical
+from rllab.envs.gym_space_util import flat_dim, flatten, flatten_n, weighted_sample
 from rllab.misc import ext
 from rllab.misc.overrides import overrides
 from rllab.policies import StochasticPolicy
 from rllab.spaces import Discrete
 
 import numpy as np
+
 
 class CategoricalMLPPolicy(StochasticPolicy, LasagnePowered):
     def __init__(
@@ -31,11 +34,12 @@ class CategoricalMLPPolicy(StochasticPolicy, LasagnePowered):
         """
         Serializable.quick_init(self, locals())
 
-        assert isinstance(env_spec.action_space, Discrete)
+        assert isinstance(env_spec.action_space, gym.spaces.Discrete)
 
         if prob_network is None:
             prob_network = MLP(
-                input_shape=(env_spec.observation_space.flat_dim * num_seq_inputs,),
+                input_shape=(
+                    flat_dim(env_spec.observation_space) * num_seq_inputs, ),
                 output_dim=env_spec.action_space.n,
                 hidden_sizes=hidden_sizes,
                 hidden_nonlinearity=hidden_nonlinearity,
@@ -44,8 +48,9 @@ class CategoricalMLPPolicy(StochasticPolicy, LasagnePowered):
 
         self._l_prob = prob_network.output_layer
         self._l_obs = prob_network.input_layer
-        self._f_prob = ext.compile_function([prob_network.input_layer.input_var], L.get_output(
-            prob_network.output_layer))
+        self._f_prob = ext.compile_function(
+            [prob_network.input_layer.input_var],
+            L.get_output(prob_network.output_layer))
 
         self._dist = Categorical(env_spec.action_space.n)
 
@@ -66,18 +71,18 @@ class CategoricalMLPPolicy(StochasticPolicy, LasagnePowered):
     # the current policy
     @overrides
     def get_action(self, observation, deterministic=False):
-        flat_obs = self.observation_space.flatten(observation)
+        flat_obs = flatten(self.observation_space, observation)
         prob = self._f_prob([flat_obs])[0]
         if deterministic:
             action = np.argmax(prob)
         else:
-            action = self.action_space.weighted_sample(prob)
+            action = weighted_sample(self.action_space, prob)
         return action, dict(prob=prob)
 
     def get_actions(self, observations):
-        flat_obs = self.observation_space.flatten_n(observations)
+        flat_obs = flatten_n(self.observation_space, observations)
         probs = self._f_prob(flat_obs)
-        actions = list(map(self.action_space.weighted_sample, probs))
+        actions = list(map(weighted_sample(self.action_space), probs))
         return actions, dict(prob=probs)
 
     @property

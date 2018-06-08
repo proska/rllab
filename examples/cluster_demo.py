@@ -1,7 +1,10 @@
+import sys
+
 from rllab.algos import TRPO
 from rllab.baselines import LinearFeatureBaseline
-from rllab.envs.box2d import CartpoleEnv
 from rllab.envs import normalize
+from rllab.envs.box2d import CartpoleEnv
+from rllab.envs.gym_env_util import spec
 from rllab.misc import stub, run_experiment_lite
 from rllab.policies import GaussianMLPPolicy
 import sys
@@ -11,12 +14,11 @@ def run_task(v):
     env = normalize(CartpoleEnv())
 
     policy = GaussianMLPPolicy(
-        env_spec=env.spec,
+        env_spec=spec(env),
         # The neural network policy should have two hidden layers, each with 32 hidden units.
-        hidden_sizes=(32, 32)
-    )
+        hidden_sizes=(32, 32))
 
-    baseline = LinearFeatureBaseline(env_spec=env.spec)
+    baseline = LinearFeatureBaseline(env_spec=spec(env))
 
     algo = TRPO(
         env=env,

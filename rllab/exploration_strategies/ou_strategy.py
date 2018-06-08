@@ -1,10 +1,12 @@
-from rllab.misc.overrides import overrides
-from rllab.misc import AttrDict
-from rllab.core import Serializable
-from rllab.spaces import Box
-from rllab.exploration_strategies import ExplorationStrategy
+import gym
 import numpy as np
 import numpy.random as nr
+
+from rllab.core import Serializable
+from rllab.envs.gym_space_util import flat_dim
+from rllab.exploration_strategies import ExplorationStrategy
+from rllab.misc.overrides import overrides
+from rllab.misc import AttrDict
 
 
 class OUStrategy(ExplorationStrategy, Serializable):
@@ -17,14 +19,14 @@ class OUStrategy(ExplorationStrategy, Serializable):
     """
 
     def __init__(self, env_spec, mu=0, theta=0.15, sigma=0.3, **kwargs):
-        assert isinstance(env_spec.action_space, Box)
+        assert isinstance(env_spec.action_space, gym.spaces.Box)
         assert len(env_spec.action_space.shape) == 1
         Serializable.quick_init(self, locals())
         self.mu = mu
         self.theta = theta
         self.sigma = sigma
         self.action_space = env_spec.action_space
-        self.state = np.ones(self.action_space.flat_dim) * self.mu
+        self.state = np.ones(flat_dim(self.action_space)) * self.mu
         self.reset()
 
     def __getstate__(self):
@@ -38,7 +40,7 @@ class OUStrategy(ExplorationStrategy, Serializable):
 
     @overrides
     def reset(self):
-        self.state = np.ones(self.action_space.flat_dim) * self.mu
+        self.state = np.ones(flat_dim(self.action_space)) * self.mu
 
     def evolve_state(self):
         x = self.state
@@ -50,11 +52,18 @@ class OUStrategy(ExplorationStrategy, Serializable):
     def get_action(self, t, observation, policy, **kwargs):
         action, _ = policy.get_action(observation)
         ou_state = self.evolve_state()
-        return np.clip(action + ou_state, self.action_space.low, self.action_space.high)
+        return np.clip(action + ou_state, self.action_space.low,
+                       self.action_space.high)
 
 
 if __name__ == "__main__":
-    ou = OUStrategy(env_spec=AttrDict(action_space=Box(low=-1, high=1, shape=(1,))), mu=0, theta=0.15, sigma=0.3)
+    ou = OUStrategy(
+        env_spec=AttrDict(
+            action_space=gym.spaces.Box(low=-1, high=1, shape=(1, ))),
+        mu=0,
+        theta=0.15,
+        sigma=0.3,
+        dtype=np.float32)
     states = []
     for i in range(1000):
         states.append(ou.evolve_state()[0])

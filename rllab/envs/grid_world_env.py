@@ -5,30 +5,12 @@ from rllab.envs import Step
 from rllab.core import Serializable
 
 MAPS = {
-    "chain": [
-        "GFFFFFFFFFFFFFSFFFFFFFFFFFFFG"
-    ],
-    "4x4_safe": [
-        "SFFF",
-        "FWFW",
-        "FFFW",
-        "WFFG"
-    ],
-    "4x4": [
-        "SFFF",
-        "FHFH",
-        "FFFH",
-        "HFFG"
-    ],
+    "chain": ["GFFFFFFFFFFFFFSFFFFFFFFFFFFFG"],
+    "4x4_safe": ["SFFF", "FWFW", "FFFW", "WFFG"],
+    "4x4": ["SFFF", "FHFH", "FFFH", "HFFG"],
     "8x8": [
-        "SFFFFFFF",
-        "FFFFFFFF",
-        "FFFHFFFF",
-        "FFFFFHFF",
-        "FFFHFFFF",
-        "FHHFFFHF",
-        "FHFFHFHF",
-        "FFFHFFFG"
+        "SFFFFFFF", "FFFFFFFF", "FFFHFFFF", "FFFFFHFF", "FFFHFFFF", "FHHFFFHF",
+        "FHFFHFHF", "FFFHFFFG"
     ],
 }
 
@@ -54,7 +36,7 @@ class GridWorldEnv(Env, Serializable):
         desc[desc == 'x'] = 'W'
         self.desc = desc
         self.n_row, self.n_col = desc.shape
-        (start_x,), (start_y,) = np.nonzero(desc == 'S')
+        (start_x, ), (start_y, ) = np.nonzero(desc == 'S')
         self.start_state = start_x * self.n_col + start_y
         self.state = None
         self.domain_fig = None
@@ -70,12 +52,7 @@ class GridWorldEnv(Env, Serializable):
         purposes.
         :return: the action index corresponding to the given direction
         """
-        return dict(
-            left=0,
-            down=1,
-            right=2,
-            up=3
-        )[d]
+        return dict(left=0, down=1, right=2, up=3)[d]
 
     def step(self, action):
         """
@@ -87,7 +64,8 @@ class GridWorldEnv(Env, Serializable):
         :param action: should be a one-hot vector encoding the action
         :return:
         """
-        possible_next_states = self.get_possible_next_states(self.state, action)
+        possible_next_states = self.get_possible_next_states(
+            self.state, action)
 
         probs = [x[1] for x in possible_next_states]
         next_state_idx = np.random.choice(len(probs), p=probs)
@@ -127,11 +105,8 @@ class GridWorldEnv(Env, Serializable):
         coords = np.array([x, y])
 
         increments = np.array([[0, -1], [1, 0], [0, 1], [-1, 0]])
-        next_coords = np.clip(
-            coords + increments[action],
-            [0, 0],
-            [self.n_row - 1, self.n_col - 1]
-        )
+        next_coords = np.clip(coords + increments[action], [0, 0],
+                              [self.n_row - 1, self.n_col - 1])
         next_state = next_coords[0] * self.n_col + next_coords[1]
         state_type = self.desc[x, y]
         next_state_type = self.desc[next_coords[0], next_coords[1]]
@@ -142,9 +117,8 @@ class GridWorldEnv(Env, Serializable):
 
     @property
     def action_space(self):
-        return Discrete(4)
+        return gym.spaces.Discrete(4)
 
     @property
     def observation_space(self):
-        return Discrete(self.n_row * self.n_col)
-
+        return gym.spaces.Discrete(self.n_row * self.n_col)

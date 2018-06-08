@@ -1,3 +1,4 @@
+import gym
 import lasagne.layers as L
 import lasagne.nonlinearities as NL
 import numpy as np
@@ -8,43 +9,40 @@ from rllab.core import GRUNetwork
 from rllab.core import OpLayer
 from rllab.core import Serializable
 from rllab.distributions import RecurrentCategorical
+from rllab.envs.gym_space_util import flat_dim, flatten
 from rllab.misc import ext
-from rllab.spaces import Discrete
 from rllab.misc import special
 from rllab.misc.overrides import overrides
 from rllab.policies import StochasticPolicy
+from rllab.spaces import Discrete
 
 
 class CategoricalGRUPolicy(StochasticPolicy, LasagnePowered):
-    def __init__(
-            self,
-            env_spec,
-            hidden_dim=32,
-            feature_network=None,
-            state_include_action=True,
-            hidden_nonlinearity=NL.tanh):
+    def __init__(self,
+                 env_spec,
+                 hidden_dim=32,
+                 feature_network=None,
+                 state_include_action=True,
+                 hidden_nonlinearity=NL.tanh):
         """
         :param env_spec: A spec for the env.
         :param hidden_dim: dimension of hidden layer
         :param hidden_nonlinearity: nonlinearity used for each hidden layer
         :return:
         """
-        assert isinstance(env_spec.action_space, Discrete)
+        assert isinstance(env_spec.action_space, gym.spaces.Discrete)
         Serializable.quick_init(self, locals())
         super(CategoricalGRUPolicy, self).__init__(env_spec)
 
-        obs_dim = env_spec.observation_space.flat_dim
-        action_dim = env_spec.action_space.flat_dim
+        obs_dim = flat_dim(env_spec.observation_space)
+        action_dim = flat_dim(env_spec.action_space)
 
         if state_include_action:
             input_dim = obs_dim + action_dim
         else:
             input_dim = obs_dim
 
-        l_input = L.InputLayer(
-            shape=(None, None, input_dim),
-            name="input"
-        )
+        l_input = L.InputLayer(shape=(None, None, input_dim), name="input")
 
         if feature_network is None:
             feature_dim = input_dim
@@ -65,14 +63,13 @@ class CategoricalGRUPolicy(StochasticPolicy, LasagnePowered):
             )
 
         prob_network = GRUNetwork(
-            input_shape=(feature_dim,),
+            input_shape=(feature_dim, ),
             input_layer=l_feature,
             output_dim=env_spec.action_space.n,
             hidden_dim=hidden_dim,
             hidden_nonlinearity=hidden_nonlinearity,
             output_nonlinearity=TT.nnet.softmax,
-            name="prob_network"
-        )
+            name="prob_network")
 
         self.prob_network = prob_network
         self.feature_network = feature_network
@@ -83,18 +80,18 @@ class CategoricalGRUPolicy(StochasticPolicy, LasagnePowered):
         if feature_network is None:
             feature_var = flat_input_var
         else:
-            feature_var = L.get_output(l_flat_feature, {feature_network.input_layer: flat_input_var})
+            feature_var = L.get_output(
+                l_flat_feature, {
+                    feature_network.input_layer: flat_input_var
+                })
 
         self.f_step_prob = ext.compile_function(
-            [
-                flat_input_var,
-                prob_network.step_prev_hidden_layer.input_var
-            ],
+            [flat_input_var, prob_network.step_prev_hidden_layer.input_var],
             L.get_output([
-                prob_network.step_output_layer,
-                prob_network.step_hidden_layer
-            ], {prob_network.step_input_layer: feature_var})
-        )
+                prob_network.step_output_layer, prob_network.step_hidden_layer
+            ], {
+                prob_network.step_input_layer: feature_var
+            }))
 
         self.input_dim = input_dim
         self.action_dim = action_dim
@@ -116,28 +113,23 @@ class CategoricalGRUPolicy(StochasticPolicy, LasagnePowered):
         obs_var = obs_var.reshape((n_batches, n_steps, -1))
         if self.state_include_action:
             prev_action_var = state_info_vars["prev_action"]
-            all_input_var = TT.concatenate(
-                [obs_var, prev_action_var],
-                axis=2
-            )
+            all_input_var = TT.concatenate([obs_var, prev_action_var], axis=2)
         else:
             all_input_var = obs_var
 
         if self.feature_network is None:
             return dict(
-                prob=L.get_output(
-                    self.prob_network.output_layer,
-                    {self.l_input: all_input_var}
-                )
-            )
+                prob=L.get_output(self.prob_network.output_layer, {
+                    self.l_input: all_input_var
+                }))
         else:
             flat_input_var = TT.reshape(all_input_var, (-1, self.input_dim))
             return dict(
                 prob=L.get_output(
-                    self.prob_network.output_layer,
-                    {self.l_input: all_input_var, self.feature_network.input_layer: flat_input_var}
-                )
-            )
+                    self.prob_network.output_layer, {
+                        self.l_input: all_input_var,
+                        self.feature_network.input_layer: flat_input_var
+                    }))
 
     def reset(self):
         self.prev_action = None
@@ -151,18 +143,18 @@ class CategoricalGRUPolicy(StochasticPolicy, LasagnePowered):
     def get_action(self, observation):
         if self.state_include_action:
             if self.prev_action is None:
-                prev_action = np.zeros((self.action_space.flat_dim,))
+                prev_action = np.zeros((flat_dim(self.action_space), ))
             else:
-                prev_action = self.action_space.flatten(self.prev_action)
-            all_input = np.concatenate([
-                self.observation_space.flatten(observation),
-                prev_action
-            ])
+                prev_action = flatten(self.action_space, self.prev_action)
+            all_input = np.concatenate(
+                [flatten(self.observation_space, observation), prev_action])
         else:
-            all_input = self.observation_space.flatten(observation)
+            all_input = flatten(self.observation_space, observation)
             # should not be used
             prev_action = np.nan
-        probs, hidden_vec = [x[0] for x in self.f_step_prob([all_input], [self.prev_hidden])]
+        probs, hidden_vec = [
+            x[0] for x in self.f_step_prob([all_input], [self.prev_hidden])
+        ]
         action = special.weighted_sample(probs, range(self.action_space.n))
         self.prev_action = action
         self.prev_hidden = hidden_vec

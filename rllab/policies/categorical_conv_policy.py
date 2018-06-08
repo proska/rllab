@@ -1,17 +1,19 @@
+import gym
+import numpy as np
+import lasagne.nonlinearities as NL
+
 from rllab.core import LasagnePowered
 import lasagne.layers as L
 from rllab.core import ConvNetwork
 from rllab.distributions import Categorical
-from rllab.policies import StochasticPolicy
-from rllab.misc import tensor_utils
-from rllab.spaces import Discrete
-
 from rllab.core import Serializable
+from rllab.envs.gym_space_util import flatten, flatten_n, weighted_sample
 from rllab.misc import ext
 from rllab.misc import logger
+from rllab.misc import tensor_utils
 from rllab.misc.overrides import overrides
-import numpy as np
-import lasagne.nonlinearities as NL
+from rllab.policies import StochasticPolicy
+from rllab.spaces import Discrete
 
 
 class CategoricalConvPolicy(StochasticPolicy, LasagnePowered):
@@ -19,7 +21,10 @@ class CategoricalConvPolicy(StochasticPolicy, LasagnePowered):
             self,
             name,
             env_spec,
-            conv_filters, conv_filter_sizes, conv_strides, conv_pads,
+            conv_filters,
+            conv_filter_sizes,
+            conv_strides,
+            conv_pads,
             hidden_sizes=[],
             hidden_nonlinearity=NL.rectify,
             output_nonlinearity=NL.softmax,
@@ -35,7 +40,7 @@ class CategoricalConvPolicy(StochasticPolicy, LasagnePowered):
         """
         Serializable.quick_init(self, locals())
 
-        assert isinstance(env_spec.action_space, Discrete)
+        assert isinstance(env_spec.action_space, gym.spaces.Discrete)
 
         self._env_spec = env_spec
 
@@ -57,8 +62,7 @@ class CategoricalConvPolicy(StochasticPolicy, LasagnePowered):
         self._l_obs = prob_network.input_layer
         self._f_prob = ext.compile_function(
             [prob_network.input_layer.input_var],
-            L.get_output(prob_network.output_layer)
-        )
+            L.get_output(prob_network.output_layer))
 
         self._dist = Categorical(env_spec.action_space.n)
 
@@ -71,12 +75,7 @@ class CategoricalConvPolicy(StochasticPolicy, LasagnePowered):
 
     @overrides
     def dist_info_sym(self, obs_var, state_info_vars=None):
-        return dict(
-            prob=L.get_output(
-                self._l_prob,
-                {self._l_obs: obs_var}
-            )
-        )
+        return dict(prob=L.get_output(self._l_prob, {self._l_obs: obs_var}))
 
     @overrides
     def dist_info(self, obs, state_infos=None):
@@ -88,15 +87,15 @@ class CategoricalConvPolicy(StochasticPolicy, LasagnePowered):
     # the current policy
     @overrides
     def get_action(self, observation):
-        flat_obs = self.observation_space.flatten(observation)
+        flat_obs = flatten(self.observation_space, observation)
         prob = self._f_prob([flat_obs])[0]
-        action = self.action_space.weighted_sample(prob)
+        action = weighted_sample(self.action_space, prob)
         return action, dict(prob=prob)
 
     def get_actions(self, observations):
-        flat_obs = self.observation_space.flatten_n(observations)
+        flat_obs = flatten_n(self.observation_space, observations)
         probs = self._f_prob(flat_obs)
-        actions = list(map(self.action_space.weighted_sample, probs))
+        actions = list(map(weighted_sample(self.action_space), probs))
         return actions, dict(prob=probs)
 
     @property

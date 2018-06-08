@@ -1,6 +1,7 @@
-import tempfile
+import gym
 import os
 import os.path as osp
+import tempfile
 import warnings
 
 from cached_property import cached_property
@@ -16,6 +17,7 @@ import theano
 
 from rllab import spaces
 from rllab.envs import Env
+from rllab.envs.gym_space_util import bounds
 from rllab.misc.overrides import overrides
 from rllab.misc import autoargs
 from rllab.misc import logger
@@ -40,7 +42,7 @@ def q_mult(a, b):  # multiply two quaternion
     return [w, i, j, k]
 
 
-class MujocoEnv(Env):
+class MujocoEnv(gym.Env):
     FILE = None
 
     @autoargs.arg(
@@ -91,18 +93,18 @@ class MujocoEnv(Env):
         bounds = self.model.actuator_ctrlrange
         lb = bounds[:, 0]
         ub = bounds[:, 1]
-        return spaces.Box(lb, ub)
+        return gym.spaces.Box(lb, ub, dtype=np.float32)
 
     @cached_property
     @overrides
     def observation_space(self):
         shp = self.get_current_obs().shape
         ub = BIG * np.ones(shp)
-        return spaces.Box(ub * -1, ub)
+        return gym.spaces.Box(ub * -1, ub, dtype=np.float32)
 
     @property
     def action_bounds(self):
-        return self.action_space.bounds
+        return bounds(self.action_space)
 
     def reset_mujoco(self, init_state=None):
         self.sim.reset()
