@@ -1,7 +1,7 @@
 from rllab.baselines import LinearFeatureBaseline
 from rllab.envs import GymEnv
 from rllab.envs import normalize
-from rllab.envs.gym_env_util import spec
+from rllab.envs.gym_util.env_util import spec
 from rllab.misc import stub, run_experiment_lite
 
 from sandbox.rocky.tf.envs import TfEnv

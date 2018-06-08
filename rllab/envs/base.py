@@ -48,7 +48,7 @@ class Env(object):
 
     # Helpers that derive from Spaces
     @property
-    def action_dim(self):
+    def action_flat_dim(self):
         return self.action_space.flat_dim
 
     def render(self):
@@ -74,7 +74,6 @@ class Env(object):
         """
         raise NotImplementedError
 
-
     def terminate(self):
         """
         Clean up operation,
@@ -88,7 +87,8 @@ class Env(object):
         pass
 
 
-_Step = collections.namedtuple("Step", ["observation", "reward", "done", "info"])
+_Step = collections.namedtuple("Step",
+                               ["observation", "reward", "done", "info"])
 
 
 def Step(observation, reward, done, **kwargs):

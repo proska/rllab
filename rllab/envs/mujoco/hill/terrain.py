@@ -10,7 +10,7 @@ try:
 except Exception:
     matplotlib.use('Agg')
 
-from rllab.envs.gym_space_util import flat_dim
+from rllab.envs.gym_util.space_util import flat_dim
 
 # the colormap should assign light colors to low values
 TERRAIN_CMAP = 'Greens'

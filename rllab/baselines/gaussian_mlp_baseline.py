@@ -3,7 +3,7 @@ import numpy as np
 from rllab.core import Serializable
 from rllab.core import Parameterized
 from rllab.baselines import Baseline
-from rllab.envs.gym_space_util import flat_dim
+from rllab.envs.gym_util.space_util import flat_dim
 from rllab.misc.overrides import overrides
 from rllab.regressors.gaussian_mlp_regressor import GaussianMLPRegressor
 
