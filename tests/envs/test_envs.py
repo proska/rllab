@@ -34,7 +34,6 @@ except OSError:
 from rllab.envs import NoisyObservationEnv, DelayedActionEnv
 from rllab.envs import NormalizedEnv
 from rllab.envs import ProxyEnv
-from rllab.envs import GymEnv
 
 simple_env_classes = [
     GridWorldEnv,
@@ -68,7 +67,6 @@ envs.append(IdentificationEnv(CartpoleEnv, {}))
 envs.append(NoisyObservationEnv(CartpoleEnv()))
 envs.append(DelayedActionEnv(CartpoleEnv()))
 envs.append(NormalizedEnv(CartpoleEnv()))
-envs.append(GymEnv('CartPole-v0'))
 
 
 @tools.params(*envs)
