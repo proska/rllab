@@ -1,6 +1,8 @@
+import gym
+
 from rllab.baselines import LinearFeatureBaseline
-from rllab.envs import GymEnv
 from rllab.envs import normalize
+from rllab.envs.util import horizon, spec
 from rllab.misc import stub, run_experiment_lite
 
 from sandbox.rocky.tf.envs import TfEnv
@@ -11,16 +13,16 @@ stub(globals())
 
 # Need to wrap in a tf environment and force_reset to true
 # see https://github.com/openai/rllab/issues/87#issuecomment-282519288
-env = TfEnv(normalize(GymEnv("CartPole-v0", force_reset=True)))
+env = TfEnv(gym.make("CartPole-v0", force_reset=True))
 
 policy = CategoricalMLPPolicy(
 name="policy",
-env_spec=env.spec,
+env_spec=spec(env),
 # The neural network policy should have two hidden layers, each with 32 hidden units.
 hidden_sizes=(32, 32)
 )
 
-baseline = LinearFeatureBaseline(env_spec=env.spec)
+baseline = LinearFeatureBaseline(env_spec=spec(env))
 
 algo = TRPO(
     env=env,
