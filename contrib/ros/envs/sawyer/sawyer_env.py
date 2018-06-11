@@ -12,7 +12,7 @@ class SawyerEnv(RosEnv):
 
     def _initial_setup(self):
         self._robot.reset()
-        self._world.reset()
+        self._world.initialize()
 
     def shutdown(self):
         self._world.terminate()

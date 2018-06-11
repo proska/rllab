@@ -2,7 +2,7 @@ import collections
 import os.path as osp
 
 from gazebo_msgs.msg import ModelStates
-from geometry_msgs.msg import Pose, Point
+from geometry_msgs.msg import Pose, Point, Quaternion
 import numpy as np
 import rospy
 
@@ -31,8 +31,10 @@ class Block(object):
         self._initial_pos = Point(
             x=initial_pos[0], y=initial_pos[1], z=initial_pos[2])
         self._random_delta_range = random_delta_range
-        self._position = None
-        self._orientation = None
+        self._position = Point(
+            x=initial_pos[0], y=initial_pos[1], z=initial_pos[2])
+        self._orientation = Quaternion(
+            x=0., y=0., z=0., w=1.)
 
     @property
     def random_delta_range(self):
@@ -74,11 +76,11 @@ class BlockWorld(World):
         """
         self._blocks = []
         self._simulated = simulated
+        if simulated:
+            self._model_states_sub = None
 
     def initialize(self):
         if self._simulated:
-            rospy.Subscriber('/gazebo/model_states', ModelStates,
-                             self._gazebo_update_block_states)
             Gazebo.load_gazebo_model(
                 'table',
                 Pose(position=Point(x=0.75, y=0.0, z=0.0)),
@@ -92,7 +94,11 @@ class BlockWorld(World):
                 initial_pos=(0.5725, 0.1265, 0.90),
                 random_delta_range=0.15,
                 resource=osp.join(World.MODEL_DIR, 'block/model.urdf'))
+            # Waiting models to be loaded
+            rospy.sleep(1)
             self._blocks.append(block)
+            self._model_states_sub = rospy.Subscriber('/gazebo/model_states', ModelStates,
+                                                     self._gazebo_update_block_states)
         else:
             # TODO(gh/8: Sawyer runtime support)
             pass
@@ -100,7 +106,6 @@ class BlockWorld(World):
     def _gazebo_update_block_states(self, data):
         model_states = data
         model_names = model_states.name
-
         for block in self._blocks:
             block_idx = model_names.index(block.name)
             block_pose = model_states.pose[block_idx]
@@ -140,8 +145,10 @@ class BlockWorld(World):
 
     def terminate(self):
         if self._simulated:
+            self._model_states_sub.unregister()
             for block in self._blocks:
                 Gazebo.delete_gazebo_model(block.name)
+            Gazebo.delete_gazebo_model('table')
         else:
             # TODO(gh/8: Sawyer runtime support)
             pass
@@ -179,6 +186,8 @@ class BlockWorld(World):
         if self._simulated:
             Gazebo.load_gazebo_model(
                 block.name, Pose(position=block.initial_pos), block.resource)
+            # Waiting model to be loaded
+            rospy.sleep(1)
         else:
             # TODO(gh/8: Sawyer runtime support)
             pass

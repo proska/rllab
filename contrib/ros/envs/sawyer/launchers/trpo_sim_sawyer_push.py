@@ -6,8 +6,8 @@ from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 
 from sandbox.rocky.tf.algos.trpo import TRPO
-from sandbox.rocky.tf.policies.gaussian_mlp_policy import GaussianMLPPolicy
 from sandbox.rocky.tf.envs.base import TfEnv
+from sandbox.rocky.tf.policies.gaussian_mlp_policy import GaussianMLPPolicy
 
 from contrib.ros.envs.sawyer.push_env import PushEnv
 
@@ -25,7 +25,7 @@ INITIAL_SIM_ROBOT_JOINT_POS = {
 def run_task(*_):
     initial_goal = np.array([0.6, -0.1, 0.80])
 
-    rospy.init_node('trpo_sim_sawyer_pnp_exp', anonymous=True)
+    rospy.init_node('trpo_sim_sawyer_push_exp', anonymous=True)
 
     push_env = PushEnv(
         initial_goal,

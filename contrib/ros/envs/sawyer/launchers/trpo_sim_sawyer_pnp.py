@@ -6,8 +6,8 @@ from rllab.envs.normalized_env import normalize
 from rllab.misc.instrument import run_experiment_lite
 
 from sandbox.rocky.tf.algos.trpo import TRPO
-from sandbox.rocky.tf.policies.gaussian_mlp_policy import GaussianMLPPolicy
 from sandbox.rocky.tf.envs.base import TfEnv
+from sandbox.rocky.tf.policies.gaussian_mlp_policy import GaussianMLPPolicy
 
 from contrib.ros.envs.sawyer.pick_and_place_env import PickAndPlaceEnv
 
