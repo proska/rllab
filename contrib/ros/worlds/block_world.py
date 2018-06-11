@@ -33,8 +33,7 @@ class Block(object):
         self._random_delta_range = random_delta_range
         self._position = Point(
             x=initial_pos[0], y=initial_pos[1], z=initial_pos[2])
-        self._orientation = Quaternion(
-            x=0., y=0., z=0., w=1.)
+        self._orientation = Quaternion(x=0., y=0., z=0., w=1.)
 
     @property
     def random_delta_range(self):
@@ -97,8 +96,9 @@ class BlockWorld(World):
             # Waiting models to be loaded
             rospy.sleep(1)
             self._blocks.append(block)
-            self._model_states_sub = rospy.Subscriber('/gazebo/model_states', ModelStates,
-                                                     self._gazebo_update_block_states)
+            self._model_states_sub = rospy.Subscriber(
+                '/gazebo/model_states', ModelStates,
+                self._gazebo_update_block_states)
         else:
             # TODO(gh/8: Sawyer runtime support)
             pass
