@@ -1,14 +1,13 @@
 
-
+import tensorflow as tf
 
 from rllab.misc import ext
 from rllab.misc.overrides import overrides
 import rllab.misc.logger as logger
-from rllab.tf.optimizers import PenaltyLbfgsOptimizer
 from rllab.tf.algos import BatchPolopt
 from rllab.tf.misc import tensor_utils
 from rllab.tf.misc.tensor_utils import enclosing_scope
-import tensorflow as tf
+from rllab.tf.optimizers import PenaltyLbfgsOptimizer
 
 
 class NPO(BatchPolopt):

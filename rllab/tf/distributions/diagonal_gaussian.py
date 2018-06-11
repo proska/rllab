@@ -1,8 +1,6 @@
-
-
-
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
+
 from rllab.tf.distributions import Distribution
 from rllab.tf.misc.tensor_utils import enclosing_scope
 

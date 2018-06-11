@@ -1,17 +1,18 @@
+import tensorflow as tf
+
 from rllab.core import Serializable
 from rllab.misc import ext
 from rllab.misc.overrides import overrides
 from rllab.tf.core import LayersPowered
 from rllab.tf.core import MLP
+import rllab.tf.core.layers as L
+from rllab.tf.core.layers import batch_norm
 from rllab.tf.distributions import Categorical
 from rllab.tf.policies import Policy
 from rllab.tf.misc import tensor_utils
 
-import rllab.tf.core.layers as L
-from rllab.tf.core.layers import batch_norm
 
 from rllab.tf.spaces import Discrete
-import tensorflow as tf
 
 
 class DeterministicMLPPolicy(Policy, LayersPowered, Serializable):

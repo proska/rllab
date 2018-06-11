@@ -1,5 +1,5 @@
-from rllab.tf.policies import Policy
 from rllab.core import Serializable
+from rllab.tf.policies import Policy
 
 
 class UniformControlPolicy(Policy, Serializable):

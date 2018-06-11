@@ -1,12 +1,11 @@
-
+import uuid
 
 import numpy as np
 import pickle as pickle
-from rllab.tf.misc import tensor_utils
-from rllab.misc import logger
 
+from rllab.misc import logger
 from rllab.sampler import singleton_pool
-import uuid
+from rllab.tf.misc import tensor_utils
 
 
 def worker_init_envs(G, alloc, scope, env):

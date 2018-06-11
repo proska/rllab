@@ -1,10 +1,10 @@
-from rllab.tf.algos import VPG
 from rllab.baselines import LinearFeatureBaseline
-from rllab.envs.box2d import CartpoleEnv
 from rllab.envs import normalize
-from rllab.tf.policies import GaussianMLPPolicy
-from rllab.tf.envs import TfEnv
+from rllab.envs.box2d import CartpoleEnv
 from rllab.misc import stub, run_experiment_lite
+from rllab.tf.algos import VPG
+from rllab.tf.envs import TfEnv
+from rllab.tf.policies import GaussianMLPPolicy
 
 env = TfEnv(normalize(CartpoleEnv()))
 

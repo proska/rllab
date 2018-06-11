@@ -1,6 +1,7 @@
+import itertools
+
 from rllab.tf.core import Parameterized
 from rllab.tf.core import layers as L
-import itertools
 
 
 class LayersPowered(Parameterized):
