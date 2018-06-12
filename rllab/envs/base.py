@@ -74,6 +74,7 @@ class Env(object):
         """
         raise NotImplementedError
 
+
     def terminate(self):
         """
         Clean up operation,
@@ -87,8 +88,7 @@ class Env(object):
         pass
 
 
-_Step = collections.namedtuple("Step",
-                               ["observation", "reward", "done", "info"])
+_Step = collections.namedtuple("Step", ["observation", "reward", "done", "info"])
 
 
 def Step(observation, reward, done, **kwargs):
