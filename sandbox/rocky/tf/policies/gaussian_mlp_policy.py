@@ -8,11 +8,11 @@ from sandbox.rocky.tf.spaces.box import Box
 from rllab.core.serializable import Serializable
 from sandbox.rocky.tf.policies.base import StochasticPolicy
 from sandbox.rocky.tf.distributions.diagonal_gaussian import DiagonalGaussian
+from sandbox.rocky.tf.distributions.norm_dist_fac import NormDistFactory
 from rllab.misc.overrides import overrides
 from rllab.misc import logger
 from sandbox.rocky.tf.misc import tensor_utils
 import tensorflow as tf
-from tensorflow.contrib.distributions import Normal
 
 
 class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
@@ -128,7 +128,9 @@ class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
 
             self._action_dim = action_dim
             self._dist = DiagonalGaussian(action_dim)
-            
+            self._dist_fac = NormDistFactory(action_dim)
+            # self._empty_dist = create_old_dist
+
             LayersPowered.__init__(self, [l_mean, l_std_param])
             super(GaussianMLPPolicy, self).__init__(env_spec)
 
@@ -141,17 +143,6 @@ class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
                 outputs=[mean_var, log_std_var],
             )
 
-    def create_dist(self, dist_info_vars):
-        std = tf.exp(dist_info_vars["log_std"])
-        self.tf_dist = Normal(loc=dist_info_vars["mean"], scale=std)
-
-    def create_old_dist(self):
-        is_recurrent = int(self.recurrent)
-        mean = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [self._action_dim], name='old_mean')
-        log_std = tf.placeholder(tf.float32, shape=[None] * (1 + is_recurrent) + [self._action_dim], name='old_log_std')
-        std = tf.exp(log_std)
-        self.tf_old_dist = Normal(loc=mean, scale=std)
-        self.old_dist_info_vars_list = [mean, log_std]
 
     @property
     def vectorized(self):
@@ -207,3 +198,7 @@ class GaussianMLPPolicy(StochasticPolicy, LayersPowered, Serializable):
     @property
     def distribution(self):
         return self._dist
+    
+    @property
+    def distribution_factory(self):
+        return self._dist_fac

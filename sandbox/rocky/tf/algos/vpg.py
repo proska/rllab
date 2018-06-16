@@ -68,14 +68,14 @@ class VPG(BatchPolopt, Serializable):
             valid_var = None
 
         dist_info_vars = self.policy.dist_info_sym(obs_var, state_info_vars)
+        current_dist = self.policy.distribution_factory.create_dist_by_distinfo(dist_info_vars)
+        old_dist_info_vars_list, tf_old_dist = self.policy.distribution_factory.create_empty_dist(self.policy.recurrent)
 
-        self.policy.create_dist(dist_info_vars)
-        self.policy.create_old_dist()
-        
-        logli = self.policy.tf_dist.log_prob(action_var)
+
+        logli = current_dist.log_prob(action_var)
         logli = tf.reduce_sum(logli, axis=-1)
 
-        kl = self.policy.tf_dist.kl_divergence(self.policy.tf_old_dist)
+        kl = current_dist.kl_divergence(tf_old_dist)
         kl = tf.reduce_sum(kl, axis=-1)
 
         # formulate as a minimization problem
@@ -96,7 +96,7 @@ class VPG(BatchPolopt, Serializable):
         self.optimizer.update_opt(loss=surr_obj, target=self.policy, inputs=input_list)
 
         f_kl = tensor_utils.compile_function(
-            inputs=input_list + self.policy.old_dist_info_vars_list,
+            inputs=input_list + old_dist_info_vars_list,
             outputs=[mean_kl, max_kl],
         )
         self.opt_info = dict(
@@ -115,7 +115,7 @@ class VPG(BatchPolopt, Serializable):
         inputs += tuple(state_info_list)
         if self.policy.recurrent:
             inputs += (samples_data["valids"],)
-        dist_info_list = [agent_infos[k] for k in self.policy.distribution.dist_info_keys]
+        dist_info_list = [agent_infos[k] for k in self.policy.distribution_factory.dist_info_keys]
         loss_before = self.optimizer.loss(inputs)
         self.optimizer.optimize(inputs)
         loss_after = self.optimizer.loss(inputs)
